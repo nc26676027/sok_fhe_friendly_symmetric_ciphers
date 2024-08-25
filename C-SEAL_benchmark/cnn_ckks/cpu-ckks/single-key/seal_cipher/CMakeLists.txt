@@ -1,0 +1,10 @@
+message(STATUS "include seal_cipher directory")
+
+# Source files in this directory
+set(SEAL_CIPHER_SOURCE_FILES ${SEAL_CIPHER_SOURCE_FILES}
+	${CMAKE_CURRENT_LIST_DIR}/seal_helper.cpp
+)
+
+set(SEAL_CIPHER_SOURCE_FILES ${SEAL_CIPHER_SOURCE_FILES} PARENT_SCOPE)
+set(SEAL_CIPHER_HEADER_DIR ${CMAKE_CURRENT_LIST_DIR} PARENT_SCOPE)
+

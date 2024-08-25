@@ -1,0 +1,40 @@
+cmake_minimum_required(VERSION 3.16)
+
+project(cnn_ckks_project)
+set(CMAKE_CXX_COMPILER g++)
+
+
+option(AES_CTR "Build comparison operation" ON)
+#set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ./run)
+find_package(SEAL 3.6 REQUIRED)
+find_package(OpenMP REQUIRED)
+find_package(HEXL 1.2.5 HINTS ${OpenFHE_INTEL_HEXL_HINT_DIR} REQUIRED)
+set(CMAKE_CXX_COMPILER g++-11)
+
+
+get_target_property(INTEL_HEXL_LOCATION HEXL::hexl LOCATION)
+message(STATUS "INTEL_HEXL_LOCATION: ${INTEL_HEXL_LOCATION}")
+
+get_target_property(INTEL_HEXL_INCLUDE_DIR HEXL::hexl INTERFACE_INCLUDE_DIRECTORIES)
+message(STATUS "INTEL_HEXL_INCLUDE_DIR: ${INTEL_HEXL_INCLUDE_DIR}")
+
+include_directories(${INTEL_HEXL_INCLUDE_DIR})
+
+
+if(AES_CTR)
+	add_executable(aes_ctr)
+	target_sources(aes_ctr
+		PRIVATE
+			./run/run_aes_ctr.cpp
+			${SEAL_CIPHER_SOURCE_FILES}
+			${AES_ENC_SOURCE_FILES}
+			${INTEL_HEXL_INCLUDE_DIR}
+	)
+	target_compile_options(aes_ctr PRIVATE -w -O3 -std=c++17 -march=native -fopenmp)
+	# target_link_libraries(aes_ctr PRIVATE ntl gmp m SEAL::seal)
+
+	target_link_libraries(aes_ctr PRIVATE ntl gmp m OpenMP::OpenMP_CXX SEAL::seal HEXL::hexl)
+	target_include_directories(aes_ctr PUBLIC /usr/include /usr/local/include /usr/local/include/NTL ${COMMON_HEADER_DIR} ${SEAL_CIPHER_HEADER_DIR} ${AES_ENC_HEADER_DIR} ${COMP_HEADER_DIR} ${BOOTSTRAPPING_HEADER_DIR} ${INTEL_HEXL_INCLUDE_DIR})
+	# target_include_directories(cnn PUBLIC /usr/include /usr/local/include /usr/local/include/NTL ${COMMON_HEADER_DIR} ${CNN_HEADER_DIR} ${COMP_HEADER_DIR})
+endif()
+

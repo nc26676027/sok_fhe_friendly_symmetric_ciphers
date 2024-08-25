@@ -1,0 +1,11 @@
+message(STATUS "include aes_enc directory")
+
+# Source files in this directory
+set(AES_ENC_SOURCE_FILES ${AES_ENC_SOURCE_FILES}
+	${CMAKE_CURRENT_LIST_DIR}/aes_enc.cpp
+	${CMAKE_CURRENT_LIST_DIR}/poly_sbox.cpp
+)
+
+set(AES_ENC_SOURCE_FILES ${AES_ENC_SOURCE_FILES} PARENT_SCOPE)
+set(AES_ENC_HEADER_DIR ${CMAKE_CURRENT_LIST_DIR} PARENT_SCOPE)
+
