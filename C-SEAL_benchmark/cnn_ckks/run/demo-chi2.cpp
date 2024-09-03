@@ -32,10 +32,8 @@ using namespace seal;
 using namespace chrono;
 using namespace AES;
 
-// 定义一个方便的类型别名以持有时间点
 using TimeVar = std::chrono::high_resolution_clock::time_point;
 
-// 定义两个宏，用于开始时间记录 (TIC) 和计算时间消耗 (TOC) 
 #define TIC(start) TimeVar start = std::chrono::high_resolution_clock::now()
 #define TOC(start) std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now() - (start)).count()
 
@@ -43,7 +41,6 @@ using TimeVar = std::chrono::high_resolution_clock::time_point;
 #ifndef GLOBAL_STRUCT_H
 #define GLOBAL_STRUCT_H
 
-// 声明一个全局匿名结构体实例
 struct {  // SEAL and bootstrapping setting
     long boundary_K = 16; // \approx 1.81 \sqrt(h), e.g. [ 14 \approx 1.81 \sqrt(64) ]
     long boot_deg = 31;

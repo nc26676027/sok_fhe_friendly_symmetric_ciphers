@@ -211,7 +211,7 @@ func testPlainMasta(mastaParam int) {
 	rand.Read(nonce)
 	rand.Read(counter)
 	state := plainMasta(blocksize, numRound, nonce, counter, key, t)
-	fmt.Printf("State in Hex: %x\n", state )   // 小写state)
+	fmt.Printf("State in Hex: %x\n", state )   //
 }
 
 func benchmarkRtFMasta( mastaParam int) {

@@ -382,13 +382,6 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	auto &context_data = *context.key_context_data();
     auto &parms_id = context_data.parms_id();
     auto &coeff_modulus = context_data.parms().coeff_modulus();
-    
-    // 输出相关信息
-    cout << "模数链中的模数：" << endl;
-    for (const auto &mod : coeff_modulus)
-    {
-        cout <<"0x"<<hex<< mod.value() << dec <<endl;
-    }
 
 	// KeyGenerator keygen(context, 192);
 	KeyGenerator keygen(context);

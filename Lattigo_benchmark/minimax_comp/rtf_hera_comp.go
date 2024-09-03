@@ -298,7 +298,7 @@ func MinimaxCompHera( name string, numRound int, paramIndex int, radix int, full
 	printDebug(context, u2, "sort max u2:")
 	printDebug(context, u1, "sort max u1:")
 
-	elapsed := time.Since(Start) // 计算从start到现在的持续时间
+	elapsed := time.Since(Start) 
 	fmt.Printf("The infer operation took %v\n", elapsed)
 }
 

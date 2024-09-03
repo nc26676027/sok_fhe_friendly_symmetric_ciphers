@@ -24,7 +24,6 @@
  
 using namespace std;
 using namespace seal;
-// 确保头文件只被包含一次
 #ifndef AES_ENC_H
 #define AES_ENC_H
 

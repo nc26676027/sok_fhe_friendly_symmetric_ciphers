@@ -16,7 +16,6 @@ using namespace GIFT64;
 #ifndef GLOBAL_STRUCT_H
 #define GLOBAL_STRUCT_H
 
-// 声明一个全局匿名结构体实例
 struct {  // SEAL and bootstrapping setting
     long boundary_K = 16; // \approx 1.81 \sqrt(h), e.g. [ 14 \approx 1.81 \sqrt(64) ]
     long boot_deg = 31;
@@ -155,9 +154,8 @@ int main() {
     // vector<Ciphertext> ptxt = tester.HE_decrypt(sk, 128);
     auto  end  =  std::chrono::high_resolution_clock::now();
     auto  duration  =  std::chrono::duration_cast<std::chrono::milliseconds>(end  -  start);
-     //  输出结果
-    std::cout  <<  "代码执行时间："  <<  duration.count()/1000  <<  "  秒 :: " << duration.count()%1000<< "毫秒"  <<  std::endl;
-    std::cout  <<  "reEnc 代码执行时间："  <<  tester.time_BTSreEnc.count()/1000  <<  "  秒 :: " << tester.time_BTSreEnc.count()%1000<< "毫秒"  <<  std::endl;
+    std::cout  <<  "code time"  <<  duration.count()/1000  <<  "  s :: " << duration.count()%1000<< "milisecond"  <<  std::endl;
+    std::cout  <<  "reEnc time"  <<  tester.time_BTSreEnc.count()/1000  <<  "  s :: " << tester.time_BTSreEnc.count()%1000<< "milisecond"  <<  std::endl;
     cout << "scale: " << ptxt[0].scale() << endl;
     // for(int i=0;i<8;i++){
     //     tester.debugPrint(ptxt[i], "first sbox");

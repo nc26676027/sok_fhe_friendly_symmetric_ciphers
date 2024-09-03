@@ -691,7 +691,7 @@ func ResNetCifar10RtfHeraInfer(layerNum, startImageID, endImageID int, name stri
 		fmt.Println("max score: ", maxScore)
 
 	}
-	elapsed := time.Since(Start) // 计算从start到现在的持续时间
+	elapsed := time.Since(Start) 
 	fmt.Printf("The infer operation took %v\n", elapsed)
 
 }

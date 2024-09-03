@@ -222,7 +222,7 @@ func MinimaxCompRubato( name string, rubatoParam int) {
 
 	rtnVec := context.encoder.DecodeComplex(context.decryptor.DecryptNew(ctxt), context.params.LogSlots())
 	ckks_cipher.PrintVectorTrunc(rtnVec, 7, 3)
-	elapsed := time.Since(Start) // 计算从start到现在的持续时间
+	elapsed := time.Since(Start) // 
 	fmt.Printf("The infer operation took %v\n", elapsed)
 }
 

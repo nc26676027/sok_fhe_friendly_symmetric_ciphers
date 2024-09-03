@@ -83,7 +83,7 @@ func minimax_ReLU_plain(compNo int, deg []int, alpha int, trees []*Tree, scaledV
 		// fmt.Println("in poly evaluate\n",i)
 		x, _ = evalPolynomialIntegrate( x, deg[i], decompCoeff[i], trees[i])
 	}
-	// 计算 ReLU
+	//  ReLU
 	half = mHalf
 	temp, err = add_(x, half)
 	if err != nil {

@@ -99,14 +99,14 @@ func findHeraModDown(numRound int, paramIndex int, radix int, fullCoeffs bool) {
 	for i := 0; i < 16; i++ {
 		ksSlot := fvEvaluator.SlotsToCoeffsNoModSwitch(stCt[i])
 
-		invBudgets[i] = fvNoiseEstimator.InvariantNoiseBudget(ksSlot)//？？
+		invBudgets[i] = fvNoiseEstimator.InvariantNoiseBudget(ksSlot)
 		if invBudgets[i] < minInvBudget {
 			minInvBudget = invBudgets[i]
 		}
 		fvEvaluator.ModSwitchMany(ksSlot, ksSlot, ksSlot.Level())
 
-		ksCt := fvDecryptor.DecryptNew(ksSlot) //decrypt？
-		ksCoef := ckks_fv.NewPlaintextRingT(params)//reEnc？
+		ksCt := fvDecryptor.DecryptNew(ksSlot) //decrypt
+		ksCoef := ckks_fv.NewPlaintextRingT(params)//reEnc
 		fvEncoder.DecodeRingT(ksCt, ksCoef)//decode to ring ksCoef
 
 		for j := 0; j < params.FVSlots(); j++ {

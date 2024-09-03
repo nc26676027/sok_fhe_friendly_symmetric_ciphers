@@ -119,7 +119,7 @@ func main2() {
 	wg.Wait()	
 	fmt.Println("Done")
 
-	elapsed := time.Since(Start) // 计算从start到现在的持续时间
+	elapsed := time.Since(Start) //
 	fmt.Printf("The bootstrap operation took %v\n", elapsed)
 	// Decrypt, print and compare with the plaintext values
 	fmt.Println()

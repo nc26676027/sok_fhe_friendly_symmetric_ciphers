@@ -103,13 +103,6 @@ void example_ckks_basics()
 	auto &context_data = *context.key_context_data();
     auto &parms_id = context_data.parms_id();
     auto &coeff_modulus = context_data.parms().coeff_modulus();
-    
-        // 输出相关信息
-    cout << "模数链中的模数：" << endl;
-    for (const auto &mod : coeff_modulus)
-    {
-        cout <<"0x"<<hex<< mod.value() << dec <<endl;
-    }
 
     // print_parameters(context);
     // cout << endl;

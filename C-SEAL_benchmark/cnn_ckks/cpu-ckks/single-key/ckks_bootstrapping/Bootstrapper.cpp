@@ -3403,73 +3403,17 @@ void Bootstrapper::slim_bootstrap_full_real_3(Ciphertext &rtncipher, Ciphertext 
 	Ciphertext rtn;
 	slim_slottocoeff_full(rtn, cipher);
 
-    // // adjust scale to c * ct
-	// vector<double> tmpvec(Nh, 0);
-	// for (int i = 0; i < Nh; i++) {
-    //     tmpvec[i] = pow(2.0, 3);
-    // }
-    // Plaintext tmpplain;
-    // encoder.encode(tmpvec, 1, tmpplain);
-    // evaluator.mod_switch_to_inplace(tmpplain, cipher.parms_id());
-    // // std::cout << "tmpplain scale: "<<log2( tmpplain.scale() ) <<std::endl;
-    // evaluator.multiply_plain_inplace(cipher, tmpplain);
-    // decrypt_and_print(cipher, decryptor, encoder, 0, 7, 7);
-
-
-    // auto  end  =  std::chrono::high_resolution_clock::now();
-    // auto  duration  =  std::chrono::duration_cast<std::chrono::milliseconds>(end  -  start);
-    //  //  输出结果
-    // std::cout  <<  "S2C时间："  <<  duration.count()/1000  <<  "  秒 :: " << duration.count()%1000<< "毫秒"  <<  std::endl;
-    
     // start  =  std::chrono::high_resolution_clock::now();
     // cout << "Modulus Raising..." << endl;
     modraise_inplace(rtn);
     const auto &modulus = iter(context.first_context_data()->parms().coeff_modulus());
 	rtn.scale() = ((double)modulus[0].value());
-    // const auto &modulus = iter(context.first_context_data()->parms().coeff_modulus());
-	// rtn.scale() = ((double)modulus[0].value());
 
-    // cout << "curr_level after modraise: "<<context.get_context_data(rtn.parms_id())->chain_index()<<endl;
-    // end  =  std::chrono::high_resolution_clock::now();
-    // duration  =  std::chrono::duration_cast<std::chrono::milliseconds>(end  -  start);
-    //  //  输出结果
-    // std::cout  <<  "Mod Raise 时间："  <<  duration.count()/1000  <<  "  秒 :: " << duration.count()%1000<< "毫秒"  <<  std::endl;
-    
-    // start  =  std::chrono::high_resolution_clock::now();
-	// cout << "Coeff2Slots..." << endl;
     Ciphertext real_part;
 	slim_coefftoslot_full(real_part, rtn);
-    // end  =  std::chrono::high_resolution_clock::now();
-    // duration  =  std::chrono::duration_cast<std::chrono::milliseconds>(end  -  start);
-    //  //  输出结果
-    // std::cout  <<  "C2S 时间："  <<  duration.count()/1000  <<  "  秒 :: " << duration.count()%1000<< "毫秒"  <<  std::endl;
-    // start  =  std::chrono::high_resolution_clock::now();
-	// cout << "Modular reduction..." << endl;
-	mod_reducer->modular_reduction(real_part, real_part);
-    // mod_reducer->modular_reduction(img_part, img_part);
-    // end  =  std::chrono::high_resolution_clock::now();
-    // duration  =  std::chrono::duration_cast<std::chrono::milliseconds>(end  -  start);
-    // //   输出结果
-    // std::cout  <<  "modular_reduction 时间："  <<  duration.count()/1000  <<  "  秒 :: " << duration.count()%1000<< "毫秒"  <<  std::endl;
 
-    // start  =  std::chrono::high_resolution_clock::now();
-    // cout << "Sum img part into real part..." << endl;
-	// complex<double> iunit(0.0, 1.0);
-	// vector<complex<double>> tmpvec(Nh, 0);
-	// for (int i = 0; i < Nh; i++) {
-    //     tmpvec[i] += iunit;
-    // }
-    // Plaintext tmpplain;
-    // encoder.encode(tmpvec, 1.0, tmpplain);
-    // evaluator.mod_switch_to_inplace(tmpplain, img_part.parms_id());
-    // evaluator.multiply_plain(img_part, tmpplain, img_part);
-    // evaluator.add_reduced_error(real_part, img_part, rtncipher);
-    // cout <<"ScaleDown..."<<endl;
-    // ScaleDown(real_part, real_part);
-    // end  =  std::chrono::high_resolution_clock::now();
-    // duration  =  std::chrono::duration_cast<std::chrono::milliseconds>(end  -  start);
-    //  //  输出结果
-    // std::cout  <<  "add scale down 时间："  <<  duration.count()/1000  <<  "  秒 :: " << duration.count()%1000<< "毫秒"  <<  std::endl;
+	mod_reducer->modular_reduction(real_part, real_part);
+
     rtncipher = real_part;
     rtncipher.scale() = final_scale;
 }

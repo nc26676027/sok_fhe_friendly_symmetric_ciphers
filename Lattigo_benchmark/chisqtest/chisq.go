@@ -177,11 +177,11 @@ func BinaryTreeAdd(vector []*ckks_fv.Ciphertext, evaluator ckks_fv.CKKSEvaluator
 func RunChi2(SNPDir, SNPFileName, pValue, Runtime, SampleSize, SNPs string) {
 	N, err := strconv.Atoi(SampleSize)
 	if err != nil {
-		log.Fatalf("SampleSize转换错误: %v", err)
+		log.Fatalf("SampleSize turn erro: %v", err)
 	}
 	M, err := strconv.Atoi(SNPs)
 	if err != nil {
-		log.Fatalf("SNPs转换错误: %v", err)
+		log.Fatalf("SNPs turn erro: %v", err)
 	}
 	scalingFactor := 0.1*math.Pow(float64(N), -2)
 
@@ -289,17 +289,6 @@ func RunChi2(SNPDir, SNPFileName, pValue, Runtime, SampleSize, SNPs string) {
 		ySMult[i] = evaluator.MulRelinNew(sCiphertexts[i], yCiphertexts[i])
 		evaluator.RescaleMany(ySMult[i], 1, ySMult[i])
 	}
-	// var wg sync.WaitGroup // 用于等待所有goroutine完成的同步工具
-	// for i := 0; i < N/2; i++ {
-	// 	wg.Add(1) // 增加等待计数
-	// 	go func(i int) { // 使用goroutine并发执行
-	// 		defer wg.Done() // 完成时减少等待计数
-	// 		// 执行操作，假设这些方法是线程安全的
-	// 		ySMult[i] = evaluator.ShallowCopy().MulRelinNew(sCiphertexts[i], yCiphertexts[i])
-	// 		evaluator.ShallowCopy().RescaleMany(ySMult[i], 1, ySMult[i])
-	// 	}(i) // 传递当前索引i
-	// }
-	// wg.Wait() // 等待所有goroutine完成
 
 
 	n11 := BinaryTreeAdd(ySMult, evaluator);
@@ -464,7 +453,7 @@ func printDebug( str string, params *ckks_fv.Parameters, ciphertext *ckks_fv.Cip
 func main() {
 	runtime.GOMAXPROCS(64)
 	// ./chi2 --SNPdir "../data" --SNPfilename "random_sample" --pvalue "pvalue.txt" --runtime "result.txt" --samplesize="200" --snps="16384"
-	    // 定义命令行参数
+	
 	SNPDir := "data"
 	SNPFileName := "random_sample"
 	pValue := "pvalue.txt"

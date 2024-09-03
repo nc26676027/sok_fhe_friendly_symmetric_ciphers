@@ -95,11 +95,6 @@ vector<Ciphertext> AES_ENC::debug_test(std::vector<uint8_t>& ciphertexts, size_t
         debugPrint(Sout[i], "after");
     }
 
-    // auto end = std::chrono::high_resolution_clock::now();
-    // auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    //  //  输出结果
-    // std::cout  <<  "代码执行时间："  <<  duration.count()/1000  <<  "  秒 :: " << duration.count()%1000<< "毫秒"  <<  std::endl;
-
 
     // throw std::invalid_argument("finished\n\n\n\n\n");
 
@@ -245,8 +240,7 @@ std::vector<Ciphertext> AES_ENC::HE_decrypt(
 //AES encryption**********************************************
     auto  end_aes  =  std::chrono::high_resolution_clock::now();
     auto  duration_aes  =  std::chrono::duration_cast<std::chrono::milliseconds>(end_aes  -  start_aes);
-     //  输出结果
-    std::cout  <<  "代码执行时间："  <<  duration_aes.count()/1000  <<  "  秒 :: " << duration_aes.count()%1000<< "毫秒"  <<  std::endl;
+    std::cout  <<  "Code running time: "  <<  duration_aes.count()/1000  <<  "  s :: " << duration_aes.count()%1000<< "milisecond"  <<  std::endl;
 
     // add cipher
     // encode_ciphertext(ciphertexts, num_block);

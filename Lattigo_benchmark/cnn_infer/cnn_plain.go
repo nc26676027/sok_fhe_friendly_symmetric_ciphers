@@ -532,7 +532,6 @@ func averagePoolingPlainScale(cnnIn Tensor, B float64) (Tensor, error) {
 
 // matrixMultiplicationPlain 
 func matrixMultiplicationPlain(cnnIn Tensor, matrix, bias []float64, q, r int) (Tensor, error) {
-	// 参数设置
 	// parameter setting
 	ki, hi, wi, ci, ti, pi, logn := cnnIn.k, cnnIn.h, cnnIn.w, cnnIn.c, cnnIn.t, cnnIn.p, cnnIn.logn
 	ko, ho, wo, co, to, po := ki, hi, wi, ci, ti, pi
@@ -585,11 +584,11 @@ func matrixMultiplicationPlain(cnnIn Tensor, matrix, bias []float64, q, r int) (
 
 
 // *************************Base Operations************************
-// rotateVectorPlain 返回一个新的切片，该切片是对原始切片进行了旋转操作的结果。
+// rotateVectorPlain 
 func rotateVectorPlain(vec []float64, steps int) []float64 {
     n := len(vec)
     if steps < 0 {
-        steps = steps%n + n // 如果 steps 是负数，加上n保证是正的相对位置
+        steps = steps%n + n 
     }
     out := make([]float64, n)
     
@@ -599,10 +598,8 @@ func rotateVectorPlain(vec []float64, steps int) []float64 {
     return out
 }
 
-// memorySaveRotate 是一个会修改传入的 out 切片的函数，
-// 它使用 rotateVectorPlain 函数来对切片进行旋转操作。
 func memorySaveRotate(in []float64, out *[]float64, steps, n int) {
-    // 确保步数不会超出轮转范围
+
     steps = (steps + n) % n
 	if steps == 0{return}
 

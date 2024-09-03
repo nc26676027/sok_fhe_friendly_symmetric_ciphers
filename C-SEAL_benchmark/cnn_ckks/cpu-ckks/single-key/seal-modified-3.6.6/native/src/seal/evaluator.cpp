@@ -2582,7 +2582,7 @@ namespace seal
    void Evaluator::switch_key_inplace(Ciphertext &encrypted, ConstRNSIter target_iter, const KSwitchKeys &kswitch_keys, size_t kswitch_keys_index, MemoryPoolHandle pool) const
     {
         auto parms_id = encrypted.parms_id();
-        auto &context_data = *context_.get_context_data(parms_id);//*context_ dereference shared_ptr， thus context_data is &context
+        auto &context_data = *context_.get_context_data(parms_id);//*context_ dereference shared_ptr thus context_data is &context
         auto &parms = context_data.parms();
         auto &key_context_data = *context_.key_context_data();
         auto &key_parms = key_context_data.parms();

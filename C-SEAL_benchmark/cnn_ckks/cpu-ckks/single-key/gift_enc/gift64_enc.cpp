@@ -63,8 +63,7 @@ vector<Ciphertext> GIFT64_ENC::debug_test(std::vector<uint8_t>& ciphertexts, siz
     // cout << "scale: " << input_encrypted[0].scale() << endl << endl;
     auto  end  =  std::chrono::high_resolution_clock::now();
     auto  duration  =  std::chrono::duration_cast<std::chrono::milliseconds>(end  -  start);
-     //  输出结果
-    std::cout  <<  "代码执行时间："  <<  duration.count()/1000  <<  "  秒 :: " << duration.count()%1000<< "毫秒"  <<  std::endl;
+    std::cout  <<  "code running time"  <<  duration.count()/1000  <<  "  s :: " << duration.count()%1000<< "milisecond"  <<  std::endl;
     return state;
 }
 
@@ -212,8 +211,8 @@ std::vector<Ciphertext> GIFT64_ENC::HE_decrypt(
     // tester.debug_test(sk, 128);
     auto  end_gift  =  std::chrono::high_resolution_clock::now();
     auto  duration_gift  =  std::chrono::duration_cast<std::chrono::milliseconds>(end_gift  -  start_gift);
-     //  输出结果
-    std::cout  <<  "代码执行时间："  <<  duration_gift.count()/1000  <<  "  秒 :: " << duration_gift.count()%1000<< "毫秒"  <<  std::endl;
+
+    std::cout  <<  "code running time"  <<  duration_gift.count()/1000  <<  "  s :: " << duration_gift.count()%1000<< "milisecond"  <<  std::endl;
 
     // add cipher
     encode_ciphertext(ciphertexts, num_block);

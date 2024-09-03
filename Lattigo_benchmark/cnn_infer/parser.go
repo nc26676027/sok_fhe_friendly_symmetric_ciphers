@@ -66,10 +66,10 @@ func importParametersCifar10( linearWeight, linearBias *[]float64, convWeight, b
 	readParameterIntoSlice(fileName, fh*fw*ci*co, &((*convWeight)[numC]) )
     numC++
 
-	// 遍历 3 个 block
+
 	for j := 1; j <= 3; j++ {
 		for k := 0; k <= endNum; k++ {
-			// co setting 根据当前的 j 来设置 co
+			
 			if j == 1 {
 				co = 16
 			} else if j == 2 {
@@ -78,7 +78,6 @@ func importParametersCifar10( linearWeight, linearBias *[]float64, convWeight, b
 				co = 64
 			}
 
-			// ci setting 根据 j 和 k 设置 ci
 			if j == 1 || (j == 2 && k == 0) {
 				ci = 16
 			} else if (j == 2 && k != 0) || (j == 3 && k == 0) {
@@ -103,7 +102,7 @@ func importParametersCifar10( linearWeight, linearBias *[]float64, convWeight, b
 		}
 	}	
     
-	// batch normalization parameters ci设定
+	// batch normalization parameters ci
 	ci = 16
 
 	fileName = fmt.Sprintf("../../cnn_infer/pretrained_parameters/%s/bn1_bias.txt", dir)
@@ -169,7 +168,7 @@ func importParametersCifar100(linearWeight, linearBias *[]float64, convWeight, b
 	}
 	dir := "resnet32_cifar100"
 
-	// 根据需要大小重置 slice
+
 	*convWeight = make([][]float64, layerNum-1)
 	*bnBias = make([][]float64, layerNum-1)
 	*bnRunningMean = make([][]float64, layerNum-1)
@@ -184,12 +183,10 @@ func importParametersCifar100(linearWeight, linearBias *[]float64, convWeight, b
 	numC, numB, numM, numV, numW := 0, 0, 0, 0, 0
 	fh, fw, ci, co := 3, 3, 3, 16
 
-	// 对于每一个文件类型，下面是一个简化的示例来加载参数
 	fileName := fmt.Sprintf("../../cnn_infer/pretrained_parameters/%s/conv1_weight.txt", dir)
 	readParameterIntoSlice(fileName, fh*fw*ci*co, &((*convWeight)[numC]) )
     numC++
 
-	// 遍历 3 个 block
 	for j := 1; j <= 3; j++ {
 		for k := 0; k <= endNum; k++ {
 			if j == 1 {

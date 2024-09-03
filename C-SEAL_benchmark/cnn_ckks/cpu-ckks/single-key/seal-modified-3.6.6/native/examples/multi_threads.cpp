@@ -1,7 +1,7 @@
 #include <iostream>
-#include <unistd.h>   // 对于 fork(), getpid()
-#include <sys/wait.h> // 对于 waitpid()
-#include <omp.h>      // 对于 OpenMP
+#include <unistd.h>  
+#include <sys/wait.h>
+#include <omp.h>      
 #include <vector>
 #include <bitset>
 #include <chrono>
@@ -11,7 +11,6 @@
 #include "examples.h"
 using namespace std;
 
-// 定义一个简单的累加函数
 bool getrandbit(int times) {
   bool tmp = 0;
   // If state has not been initialized yet
@@ -63,10 +62,8 @@ void test_threads(){
     
 
     if (pid == -1) {
-        // fork 失败
         perror("fork");
     } else if (pid == 0) {
-        // 子进程
         std::cout << "Child Process ID: " << getpid() << std::endl;
         auto child_st = std::chrono::high_resolution_clock::now();
         single_time(64);
@@ -75,7 +72,6 @@ void test_threads(){
         std::cout <<4<<"Threads, child time taken: " << child_duration.count() << " milliseconds" << std::endl;
  
     } else {
-        // 父进程
         std::cout << "Parent Process ID: " << getpid()
                   << ", Child PID: " << pid << std::endl;
         auto parent_st = std::chrono::high_resolution_clock::now();
@@ -84,7 +80,6 @@ void test_threads(){
         auto parent_duration = std::chrono::duration_cast<std::chrono::milliseconds>(parent_ed - parent_st);
         std::cout <<4<<"Threads, parent time taken: " << parent_duration.count() << " milliseconds" << std::endl;
   
-        // 等待子进程结束
         waitpid(pid, NULL, 0);
     }
 }
@@ -97,11 +92,11 @@ void try_multi_threads() {
     auto start = std::chrono::high_resolution_clock::now();
 
     test_threads();
-    // 获取结束时间点
+
     auto end = std::chrono::high_resolution_clock::now();
-    // 计算所经过的时间，以毫秒为单位
+
     auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - start);
-    // 输出运行时间
+
     std::cout <<4<<"Threads, Time taken: " << duration.count() << " milliseconds" << std::endl;
 
 }

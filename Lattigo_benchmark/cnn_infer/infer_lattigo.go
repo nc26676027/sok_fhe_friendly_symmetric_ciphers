@@ -180,7 +180,7 @@ func ResNetCifar10LattigoSparse(layerNum, startImageID, endImageID int) {
 	// To equalize the scale, the function evaluator.SetScale(ciphertext, parameters.Scale) can be used at the expense of one level.
 	// Start := time.Now()
 	ciphertext1 = btp.BootstrappReal(ciphertext1)
-	// elapsed := time.Since(Start) // 计算从start到现在的持续时间
+	// elapsed := time.Since(Start) // 
 	// fmt.Printf("The bootstrap operation took %v\n", elapsed)
 	// Decrypt, print and compare with the plaintext values
 	fmt.Println()
@@ -464,7 +464,7 @@ func ResNetCifar10LattigoSparse(layerNum, startImageID, endImageID int) {
 		fmt.Println("max score: ", maxScore)
 
 	}
-	elapsed := time.Since(Start) // 计算从start到现在的持续时间
+	elapsed := time.Since(Start) 
 	fmt.Printf("The infer operation took %v\n", elapsed)
 
 }

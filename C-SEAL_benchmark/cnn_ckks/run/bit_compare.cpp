@@ -19,7 +19,6 @@ using namespace AES;
 #ifndef GLOBAL_STRUCT_H
 #define GLOBAL_STRUCT_H
 
-// 声明一个全局匿名结构体实例
 struct {  // SEAL and bootstrapping setting
     long boundary_K = 16; // \approx 1.81 \sqrt(h), e.g. [ 14 \approx 1.81 \sqrt(64) ]
     long boot_deg = 31;
@@ -136,7 +135,7 @@ int main() {
     // vector<Ciphertext> ptxt = tester.HE_decrypt(sk, 128);
     // evaluator.multiply_const_inplace(ptxt[0], 1);
     // evaluator.rescale_to_next_inplace(ptxt[0]);
-    std::cout  <<  "reEnc 代码执行时间："  <<  tester.time_BTSreEnc.count()/1000  <<  "  秒 :: " << tester.time_BTSreEnc.count()%1000<< "毫秒"  <<  std::endl;
+    std::cout  <<  "reEnc time"  <<  tester.time_BTSreEnc.count()/1000  <<  "  s :: " << tester.time_BTSreEnc.count()%1000<< "milisecond"  <<  std::endl;
     cout << "scale: " << ptxt[0].scale() << endl;
     for(int i=0;i<8;i++){
         tester.debugPrint(ptxt[0], "out sbox");

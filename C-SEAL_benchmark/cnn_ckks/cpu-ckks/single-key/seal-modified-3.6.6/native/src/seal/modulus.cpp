@@ -191,11 +191,6 @@ namespace seal
             result.emplace_back(prime_table[size].back());
             prime_table[size].pop_back();
         }
-        cout << "模数链中的模数：" << endl;
-        for (const auto &mod : result)
-        {
-            cout <<"0x"<<hex<< mod.value() << dec <<endl;
-        }
         // cout<< "result size: "<<result.size()<<endl;
         return result;
     }

@@ -140,7 +140,7 @@ func testPlainPasta(pastaParam int) {
 	}
 
 	state := plainPasta(blocksize, numRound, nonce, counter, key, t)
-	fmt.Printf("State in Hex: %x\n", state )   // 小写state)
+	fmt.Printf("State in Hex: %x\n", state )   // 
 }
 
 func generateRandomKey(blocksize int) ([]uint64, error) {
