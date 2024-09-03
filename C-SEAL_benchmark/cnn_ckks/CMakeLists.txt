@@ -3,10 +3,10 @@ cmake_minimum_required(VERSION 3.16)
 project(cnn_ckks_project)
 set(CMAKE_CXX_COMPILER g++)
 
-option(COMP "Build comparison operation" ON)
+option(COMP "Build comparison operation" OFF)
 option(BOOT "Build comparison operation" OFF)
-option(CNN "Build comparison operation" OFF)
-option(AES_CTR "Build comparison operation" ON)
+option(CNN "Build comparison operation" ON)
+option(AES_CTR "Build comparison operation" OFF)
 option(GIFT_CTR "Build comparison operation" OFF)
 option(GIFT64_CTR "Build comparison operation" OFF)
 
