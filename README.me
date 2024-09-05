@@ -1,41 +1,81 @@
-# Project Name
+# Project: Alongside code for paper : "SoK: Hybrid Homomorphic Encryption and FHE-Friendly Symmetric Ciphers"
 
-Welcome to our open source project! We encourage all types of contributions, whether it's reporting issues, submitting feature requests, fixing bugs, or improving documentation. If you wish to contribute anonymously, please follow the steps outlined below.
 
-## Table of Contents
-- [Why Contribute Anonymously](#why-contribute-anonymously)
-- [Creating an Anonymous GitHub Account](#creating-an-anonymous-github-account)
-- [Using Temporary Email Services](#using-temporary-email-services)
-- [Submitting Anonymous Contributions](#submitting-anonymous-contributions)
-- [Contribution Guidelines](#contribution-guidelines)
-- [Code of Conduct](#code-of-conduct)
+# This source code consists of two parts. For each part, you should enter the respective subdirectory and run the code.
+## 1.SEAL part 
 
-## Why Contribute Anonymously
+## Dependencies
+The GMP library and the NTL library is needed for the Remez algorithm.
+OpenMP library is needed for the multi-threaded execution of cnn.
+All programs for building the SEAL library is needed.
+This source code has been developed and checked in Ubuntu-20.04.
+384GB RAM is required to test one image. (not exact hard limit but encouraged)
+512GB RAM is required to test 50 images simultaneously with multi-threading. (not exact hard limit but encouraged)
 
-Anonymous contributions can protect your personal privacy and prevent the leakage of personal identification information. It also allows you to participate more freely in different open source projects.
+## Regarding SEAL library
+We use Microsoft SEAL library version 3.6.6 for RNS-CKKS homomorphic encryption scheme. Since the original SEAL library version 3.6.6 is not bootstrapping-friendly, we modified the SEAL library so that the bootstrapping operation of the RNS-CKKS scheme can be implemented. You should build and install the modified SEAL library in "cnn_ckks/cpu-ckks/single-key/seal-modified-3.6.6" if you want to build our homomorphic ResNet CNN source code. Specifically, you can build and install the modified SEAL library by the following commands.
 
-## Creating an Anonymous GitHub Account
+## Building  C-SEAL 
 
-1. Sign out of your current GitHub account:
-   - Click on your avatar in the top-right corner of GitHub, then select "Sign out".
+```PowerShell
+cd C-SEAL_benchmark
+cd cnn_ckks/cpu-ckks/single-key/seal-modified-3.6.6
+cmake -S . -B build
+cmake --build build
+cmake --install build
+```
 
-2. Create a new anonymous account:
-   - Visit the [GitHub registration page](https://github.com/join).
-   - Use a new email address that does not contain any personal information.
-   - Choose a username that does not reveal your identity.
-   - Complete the registration steps to create the new account.
+## Building AES_BtR_cnn 
+The executable file can be built by the following commands.
 
-## Using Temporary Email Services
+```PowerShell
+cd C-SEAL_benchmark
+cd cnn_ckks
+cmake -S . -B build
+cd build
+make
+```
 
-To further ensure anonymity, you can use a disposable email service to register your new GitHub account:
+The build outputs including executable is stored in "cnn_ckks/build" directory, and the executable file is named as "cnn".
 
-1. Visit a disposable email service website (e.g., [Temp Mail](https://temp-mail.org/) or [Guerrilla Mail](https://www.guerrillamail.com/)).
-2. Obtain a temporary email address.
-3. Use this temporary email address to create a new GitHub account (see steps above).
+## Other Experiment
+The main.cpp file of other experiment is lie on the dir:/C-SEAL_benchmark/cnn_ckks/run
+```PowerShell
+cd C-SEAL_benchmark
+vim CMakeLists.txt
+"open the corresponding switch"
+cd build
+make
+```
+The build outputs including executable is stored in "cnn_ckks/build" directory, and the executable file is named as "experiment_name".
 
-## Submitting Anonymous Contributions
 
-1. Clone the project repository:
-   ```sh
-   git clone https://github.com/your-repo/project-name.git
-   cd project-name
+## 2.Lattigo part
+
+## New Package
+We implement the hybrid framework in [ckks_fv](./ckks_fv), which contains the following functionalities.
+- Evaluation of the HERA/Rubato cipher in the FV scheme
+- Evaluation of the Masta/Pasta cipher in the FV scheme
+
+We implement the ResNet-20 cnn_infer in [cnn_infer](./infer_lattigo), which contains the following functionalities.
+- ResNet20 inference scheme (located at (./cnn_infer))
+- Masta/Pasta cipher in the FV scheme subquent the cnn_infer
+- HERA/Rubato cipher in the FV scheme subquent the cnn_infer
+
+We implement the GAWS chisqtest in [chisqtest](./chisq.go), which contains the following functionalities.
+- chisq test scheme (located at (./chisq.go))
+- Masta/Pasta cipher in the FV scheme subquent the chisqtest
+- HERA/Rubato cipher in the FV scheme subquent the chisqtest
+
+We implement the MiniMax compare in [minimax_comp](./minimax_comp.go), which contains the following functionalities.
+- compare scheme (located at (./minimax_comp.go))
+- Masta/Pasta cipher in the FV scheme subquent the minimax_comp
+- HERA/Rubato cipher in the FV scheme subquent the minimax_comp
+
+An example of Running ResNet20 inference in the RtF framework is given in [examples/resnet](./examples/resnet/main.go).
+
+
+An example of Running compare in the RtF framework is given in [examples/compare](./examples/compare/main.go).
+
+
+An example of Running GWAS chisqtest in the RtF framework is given in [examples/chisq](./examples/chisq/main.go).

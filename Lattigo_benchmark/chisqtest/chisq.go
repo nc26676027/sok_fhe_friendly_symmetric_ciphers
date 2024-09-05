@@ -1,4 +1,4 @@
-package main
+package chisqtest
 
 import (
 	"encoding/csv"
@@ -6,7 +6,6 @@ import (
 	"log"
 	"math"
 	"os"
-	"runtime"
 	"strconv"
 	"time"
 
@@ -450,16 +449,3 @@ func printDebug( str string, params *ckks_fv.Parameters, ciphertext *ckks_fv.Cip
 }
 
 
-func main() {
-	runtime.GOMAXPROCS(64)
-	// ./chi2 --SNPdir "../data" --SNPfilename "random_sample" --pvalue "pvalue.txt" --runtime "result.txt" --samplesize="200" --snps="16384"
-	
-	SNPDir := "data"
-	SNPFileName := "random_sample"
-	pValue := "pvalue.txt"
-	Runtime := "result.txt"
-	SampleSize := "200"
-	SNPs := "16384"
-	RunChi2(SNPDir, SNPFileName, pValue, Runtime, SampleSize, SNPs);
-
-}

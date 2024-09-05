@@ -21,7 +21,7 @@ int main(int argc, char **argv) {
 	cout << "start image: " << start << endl;
 	cout << "end image: " << end << endl;
 
-	if (dataset == 10) ResNet_cifar10_seal_sparse(layer, start, end);
+	if (dataset == 10) ResNet_cifar10_seal_sparse(layer, 0, 39);
 	// else if (dataset == 100) ResNet_cifar100_seal_sparse(layer, start, end);
 	// else throw std::invalid_argument("dataset number is not correct");
 

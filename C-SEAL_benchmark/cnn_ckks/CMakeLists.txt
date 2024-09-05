@@ -7,12 +7,11 @@ option(COMP "Build comparison operation" OFF)
 option(BOOT "Build comparison operation" OFF)
 option(CNN "Build comparison operation" ON)
 option(AES_CTR "Build comparison operation" OFF)
-option(GIFT_CTR "Build comparison operation" OFF)
 option(GIFT64_CTR "Build comparison operation" OFF)
 
 option(CHI2 "Build comparison operation" OFF)
 
-option(TEST "Build comparison operation" OFF)
+# option(TEST "Build comparison operation" OFF)
 #set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ./run)
 find_package(SEAL 3.6 REQUIRED)
 find_package(OpenMP REQUIRED)
@@ -110,38 +109,7 @@ if(AES_CTR)
 	# target_include_directories(cnn PUBLIC /usr/include /usr/local/include /usr/local/include/NTL ${COMMON_HEADER_DIR} ${CNN_HEADER_DIR} ${COMP_HEADER_DIR})
 endif()
 
-if(GIFT_CTR)
-	add_subdirectory(common)
-	add_subdirectory(cpu-ckks/single-key/seal_cipher)
 
-	if(NOT TARGET compare)
-		add_subdirectory(cpu-ckks/single-key/comp)
-	endif()
-	if(NOT TARGET bootstrapping)
-		add_subdirectory(cpu-ckks/single-key/ckks_bootstrapping)
-	endif()
-	if(NOT TARGET gift_ctr)
-		add_subdirectory(cpu-ckks/single-key/gift_enc)
-	endif()
-	
-	add_executable(gift_ctr)
-	target_sources(gift_ctr
-		PRIVATE
-			./run/run_gift_ctr.cpp
-			${COMMON_SOURCE_FILES}
-			${SEAL_CIPHER_SOURCE_FILES}
-			${GIFT_ENC_SOURCE_FILES}
-			# ${COMP_SOURCE_FILES}
-			${BOOTSTRAPPING_SOURCE_FILES}
-			${INTEL_HEXL_INCLUDE_DIR}
-	)
-	target_compile_options(gift_ctr PRIVATE -w -O3 -std=c++17 -march=native -fopenmp)
-	# target_link_libraries(aes_ctr PRIVATE ntl gmp m SEAL::seal)
-
-	target_link_libraries(gift_ctr PRIVATE ntl gmp m SEAL::seal HEXL::hexl)
-	target_include_directories(gift_ctr PUBLIC /usr/include /usr/local/include /usr/local/include/NTL ${COMMON_HEADER_DIR} ${SEAL_CIPHER_HEADER_DIR} ${GIFT_ENC_HEADER_DIR} ${COMP_HEADER_DIR} ${BOOTSTRAPPING_HEADER_DIR} ${INTEL_HEXL_INCLUDE_DIR})
-	# target_include_directories(cnn PUBLIC /usr/include /usr/local/include /usr/local/include/NTL ${COMMON_HEADER_DIR} ${CNN_HEADER_DIR} ${COMP_HEADER_DIR})
-endif()
 
 if(GIFT64_CTR)
 	add_subdirectory(common)

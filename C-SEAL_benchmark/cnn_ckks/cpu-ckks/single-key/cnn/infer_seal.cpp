@@ -603,9 +603,9 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 #else
 cout<<"Not running transciphering!\n\n\n"<<endl;
 #endif
-	#pragma omp parallel for num_threads(40)
+	#pragma omp parallel for num_threads(1)
 	// #pragma omp parallel for schedule(dynamic)
-	for(size_t image_id = start_image_id; image_id <=end_image_id; image_id++)
+	for(size_t image_id = 0; image_id <=0; image_id++)
 	// for(size_t image_id = 0; image_id <=0; image_id++)
 	{
 		// cout << "image id: " << image_id << endl;
@@ -726,17 +726,6 @@ cout<<"Not running transciphering!\n\n\n"<<endl;
 			else if(j==1) co = 32;
 			else if(j==2) co = 64;
 
-			// // sparse slot
-			// if(j==0) {
-			// 	parms.set_sparse_slots(1<<logn_1);
-			// 	encoder.set_sparse_slots(1<<logn_1);
-			// } else if(j==1) {
-			// 	parms.set_sparse_slots(1<<logn_2);
-			// 	encoder.set_sparse_slots(1<<logn_2);
-			// } else if(j==2) {
-			// 	parms.set_sparse_slots(1<<logn_3);
-			// 	encoder.set_sparse_slots(1<<logn_3);
-			// }
 
 			for(int k=0; k<=end_num; k++)	// 0 ~ 2/4/6/8/17
 			{
