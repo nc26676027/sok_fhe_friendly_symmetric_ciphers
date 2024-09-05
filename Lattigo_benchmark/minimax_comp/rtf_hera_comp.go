@@ -105,13 +105,12 @@ func MinimaxCompHera( name string, numRound int, paramIndex int, radix int, full
 
 	fvEvaluator = ckks_fv.NewMFVEvaluator(context.params, evk, pDcds)
 	context.evaluator = ckks_fv.NewCKKSEvaluator(context.params, evk)
-	var btp *ckks_fv.Bootstrapper
 	var hbtp *ckks_fv.HalfBootstrapper
 
-	if btp, err = ckks_fv.NewBootstrapperReal(context.params, btpParams, ckks_fv.BootstrappingKey(evk) ); err != nil {
-		fmt.Println("Bootstrapper 1 initial failed")
-		panic(err)
-	}
+	// if btp, err = ckks_fv.NewBootstrapperReal(context.params, btpParams, ckks_fv.BootstrappingKey(evk) ); err != nil {
+	// 	fmt.Println("Bootstrapper 1 initial failed")
+	// 	panic(err)
+	// }
 
 	if hbtp, err = ckks_fv.NewHalfBootstrapper(context.params, hbtpParams, ckks_fv.BootstrappingKey(evk) ); err != nil {
 		panic(err)
