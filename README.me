@@ -13,7 +13,14 @@ This source code has been developed and checked in Ubuntu-20.04.
 512GB RAM is required to test 50 images simultaneously with multi-threading. (not exact hard limit but encouraged)
 
 ## Regarding SEAL library
-We use Microsoft SEAL library version 3.6.6 for RNS-CKKS homomorphic encryption scheme. Since the original SEAL library version 3.6.6 is not bootstrapping-friendly, we modified the SEAL library so that the bootstrapping operation of the RNS-CKKS scheme can be implemented. You should build and install the modified SEAL library in "cnn_ckks/cpu-ckks/single-key/seal-modified-3.6.6" if you want to build our homomorphic ResNet CNN source code. Specifically, you can build and install the modified SEAL library by the following commands.
+We use Microsoft SEAL library version 3.6.6 for RNS-CKKS homomorphic encryption scheme. 
+Since the original SEAL library version 3.6.6 is not bootstrapping-friendly, we use the bootstrapping version used in paper "Low-Complexity Deep Convolutional Neural Networks on Fully Homomorphic Encryption Using Multiplexed Parallel Convolutions" and further improve its efficiency in keyswitch and advanced bootstrapping features.
+
+More precisely, the hybrid keyswitch technique which support option dnum parameter in paper "Better Bootstrapping for Approximate Homomorphic Encryption" 
+and reordered bootstrapping in paper "Homomorphic Lower Digits Removal and Improved FHE Bootstrapping".
+
+
+You should build and install the modified SEAL library in "cnn_ckks/cpu-ckks/single-key/seal-modified-3.6.6" if you want to build our homomorphic ResNet CNN source code. Specifically, you can build and install the modified SEAL library by the following commands.
 
 ## Building  C-SEAL 
 
