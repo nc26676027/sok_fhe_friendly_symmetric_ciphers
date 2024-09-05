@@ -278,26 +278,8 @@ func MinimaxCompHera( name string, numRound int, paramIndex int, radix int, full
 
 	Start := time.Now()
 	//stage 1
-	ctxt1, _:= minimaxSort(comp_no, deg, alpha, tree, scaledVal, context, ctBoot[0], ctBoot[1])
-	ctxt3, _ := minimaxSort(comp_no, deg, alpha, tree, scaledVal, context, ctBoot[2], ctBoot[3])
-	ctxt1.SetScale(context.params.Scale())
-	ctxt1 = btp.BootstrappReal(ctxt1)
-	ctxt3.SetScale(context.params.Scale())
-	ctxt3 = btp.BootstrappReal(ctxt3)
-	//stage 2
-	u4, u2tmp := minimaxSort(comp_no, deg, alpha, tree, scaledVal, context, ctxt1, ctxt3)
-	u3tmp, u1 := minimaxSort(comp_no, deg, alpha, tree, scaledVal, context, ctBoot[0], ctBoot[2])
-	u3tmp.SetScale(context.params.Scale())
-	u3tmp = btp.BootstrappReal(u3tmp)
-	u2tmp.SetScale(context.params.Scale())
-	u2tmp = btp.BootstrappReal(u2tmp)
-	u3, u2 := minimaxSort(comp_no, deg, alpha, tree, scaledVal, context, u3tmp, u2tmp)
-
-	printDebug(context, u4, "sort max u4:")
-	printDebug(context, u3, "sort max u3:")
-	printDebug(context, u2, "sort max u2:")
-	printDebug(context, u1, "sort max u1:")
-
+	ctxt1, _:= minimaxComp(comp_no, deg, alpha, tree, scaledVal, context, ctBoot[0], ctBoot[1])
+	printDebug(context, ctxt1, "sort max u4:")
 	elapsed := time.Since(Start) 
 	fmt.Printf("The infer operation took %v\n", elapsed)
 }

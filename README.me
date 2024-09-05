@@ -69,27 +69,27 @@ The build outputs including executable is stored in "cnn_ckks/build" directory, 
 ## 2.Lattigo part
 
 ## New Package
-We implement the hybrid framework in [ckks_fv](./ckks_fv), which contains the following functionalities.
+We implement the hybrid framework in [./Lattigo_benchmark/ckks_fv/](./Lattigo_benchmark/ckks_fv/), which contains the following functionalities.
 - Evaluation of the HERA/Rubato cipher in the FV scheme
 - Evaluation of the Masta/Pasta cipher in the FV scheme
 
-We implement the ResNet-20 cnn_infer in [cnn_infer](./infer_lattigo), which contains the following functionalities.
+We implement the ResNet-20 cnn_infer in [./Lattigo_benchmark/cnn_infer/](./Lattigo_benchmark/cnn_infer/), which contains the following functionalities.
 - ResNet20 inference scheme (located at (./cnn_infer))
 - Masta/Pasta cipher in the FV scheme subquent the cnn_infer
 - HERA/Rubato cipher in the FV scheme subquent the cnn_infer
 
-We implement the GAWS chisqtest in [chisqtest](./chisq.go), which contains the following functionalities.
+We implement the GAWS chisqtest in [./Lattigo_benchmark/chisqtest/](./Lattigo_benchmark/chisqtest/), which contains the following functionalities.
 - chisq test scheme (located at (./chisq.go))
 - Masta/Pasta cipher in the FV scheme subquent the chisqtest
 - HERA/Rubato cipher in the FV scheme subquent the chisqtest
 
-We implement the MiniMax compare in [minimax_comp](./minimax_comp.go), which contains the following functionalities.
+We implement the MiniMax compare in [./Lattigo_benchmark/minimax_comp/](./Lattigo_benchmark/minimax_comp/), which contains the following functionalities.
 - compare scheme (located at (./minimax_comp.go))
 - Masta/Pasta cipher in the FV scheme subquent the minimax_comp
 - HERA/Rubato cipher in the FV scheme subquent the minimax_comp
 
-An example of Running ResNet20 inference in the RtF framework is given in [examples/resnet](./examples/resnet/main.go).
+An example of Running ResNet20 inference in the RtF framework is given in [examples/resnet](./Lattigo_benchmark/examples/resnet/main.go).
 
-An example of Running compare in the RtF framework is given in [examples/compare](./examples/compare/main.go).
+An example of Running compare in the RtF framework is given in [examples/compare](./Lattigo_benchmark/examples/compare/main.go).
 
-An example of Running GWAS chisqtest in the RtF framework is given in [examples/chisq](./examples/chisq/main.go).
+An example of Running GWAS chisqtest in the RtF framework is given in [examples/chisq](./Lattigo_benchmark/examples/chisq/main.go).
