@@ -29,8 +29,8 @@ struct {  // SEAL and bootstrapping setting
     long logn_3 = 12;
     long sparse_slots = (1 << logn_1);
     int logp = 42;
-    int logq = 58; 
-    int log_special_prime = 60;
+    int logq = 50; 
+    int log_special_prime = 50;
 	double scale = pow(2.0, logp);
     int log_integer_part = logq - logp - loge + 5;
     // int log_integer_part = 0;
@@ -78,19 +78,6 @@ SEALContext create_context(int seclevel) {
     size_t poly_modulus_degree = (size_t)(1 << logN);
     parms.set_poly_modulus_degree(poly_modulus_degree);
     cout << "Setting poly_modulus_degree" << endl;
-    // parms.set_coeff_modulus(
-    //     {0x3ffffffffbe0001, 0x3ffffe80001, 0x3ffffd20001,
-    //      0x3ffffca0001, 0x3ffffbe0001, 0x3ffff4e0001,
-    //      0x3fffefa0001, 0x3fffee60001, 0x3fffe880001,
-    //      0x3fffe820001, 0x3fffe800001, 0x3fffe580001,
-    //      0x3fffe560001, // first modulu and remaining modulus
-    //      0x3fffffffdd80001, 0x3ffffffff3a0001, 0x3ffffffff040001,
-    //      0x3fffffffed60001, 0x3fffffffed00001, 0x3fffffffeb00001,
-    //      0x3fffffffea00001, 0x3fffffffe800001, 0x3fffffffe440001,
-    //      0x3fffffffe320001, 0x3fffffffe2c0001, 0x3fffffffdfe0001,
-    //      0x7ffffffffcc0001, 0x7ffffffffba0001, 0x7ffffffffb00001,
-    //      0xffffffffffc0001, 0xfffffffff840001});  //
-
     parms.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, coeff_bit_vec)); 
     cout << "Setting set_coeff_modulus" << endl;
     // modified SEAL

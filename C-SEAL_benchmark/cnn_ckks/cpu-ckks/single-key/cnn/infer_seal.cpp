@@ -605,7 +605,7 @@ cout<<"Not running transciphering!\n\n\n"<<endl;
 #endif
 	#pragma omp parallel for num_threads(1)
 	// #pragma omp parallel for schedule(dynamic)
-	for(size_t image_id = 0; image_id <=0; image_id++)
+	for(size_t image_id = start_image_id; image_id <=end_image_id; image_id++)
 	// for(size_t image_id = 0; image_id <=0; image_id++)
 	{
 		// cout << "image id: " << image_id << endl;

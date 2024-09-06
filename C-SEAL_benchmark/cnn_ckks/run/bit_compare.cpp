@@ -20,9 +20,9 @@ using namespace AES;
 #define GLOBAL_STRUCT_H
 
 struct {  // SEAL and bootstrapping setting
-    long boundary_K = 16; // \approx 1.81 \sqrt(h), e.g. [ 14 \approx 1.81 \sqrt(64) ]
-    long boot_deg = 31;
-    long scale_factor = 3;
+    long boundary_K = 25; // \approx 1.81 \sqrt(h), e.g. [ 14 \approx 1.81 \sqrt(64) ]
+    long boot_deg = 59;
+    long scale_factor = 2;
     long inverse_deg = 1; 
     long logN = 16;
     long loge = 10; 
@@ -32,16 +32,16 @@ struct {  // SEAL and bootstrapping setting
     long logn_3 = 12;
     long sparse_slots = (1 << logn_1);
     int logp = 42;
-    int logq = 58;
-    int log_special_prime = 60;
+    int logq = 49;
+    int log_special_prime = 50;
 	double scale = pow(2.0, logp);
     int log_integer_part = logq - logp - loge + 5;
     // int log_integer_part = logq - logp;
-    int remaining_level = 16; // Calculation required
-    int boot_level = 0; // 
+    int remaining_level = 12; // Calculation required
+    int boot_level = 11; // 
     int n_special_prime = 5; //
     int total_level = remaining_level + boot_level;
-    size_t secret_key_hamming_weight = 32;
+    size_t secret_key_hamming_weight = 192;
     size_t slot_count;
 } SEAL_context_params;
 
