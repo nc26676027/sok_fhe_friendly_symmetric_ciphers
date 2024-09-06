@@ -1,8 +1,8 @@
 # Project: Alongside code for paper : "SoK: Hybrid Homomorphic Encryption and FHE-Friendly Symmetric Ciphers"
 
 
-# This source code consists of two parts. For each part, you should enter the respective subdirectory and run the code.
-## 1.SEAL part 
+## This source code consists of two parts. For each part, you should enter the respective subdirectory and run the code.
+# 1. SEAL part 
 
 ## Dependencies
 The GMP library and the NTL library is needed for the Remez algorithm.
@@ -44,6 +44,14 @@ make
 ```
 
 The build outputs including executable is stored in "cnn_ckks/build" directory, and the executable file is named as "cnn".
+```PowerShell
+./cnn 20 10 0 39
+```
+
+## Possible Problem
+subdirectory "cpu_features" of Dependencies of HEXL compile errors
+change branch "master" to "main" in dir "C-SEAL_benchmark/cnn_ckks/cpu-ckks/single-key/seal-modified-3.6.6/thirdparty/hexl-src/cmake/cpu-features/CMakeLists.txt.in"
+And run build process of C-SEAL library again. 
 
 ## Other Experiment
 We implement the HHE framework in [cnn_ckks/cpu-ckks/single-key](./C-SEAL_benchmark/cnn_ckks/cpu-ckks/single-key/), which contains the following functionalities.
@@ -66,7 +74,7 @@ make
 The build outputs including executable is stored in "cnn_ckks/build" directory, and the executable file is named as "experiment_name".
 
 
-## 2.Lattigo part
+# 2. Lattigo part
 
 ## New Package
 We implement the hybrid framework in [./Lattigo_benchmark/ckks_fv/](./Lattigo_benchmark/ckks_fv/), which contains the following functionalities.

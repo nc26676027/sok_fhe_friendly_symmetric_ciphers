@@ -242,29 +242,6 @@ Ciphertext GIFT64_ENC::IsEq(vector<Ciphertext> x, int index){
     evaluator.rescale_to_next_inplace(x[0]);
     return x[0];
 }
-//compare two 8-bit data is equal or not, if eq return "1" else return "0"(two input: 1. cipher x 2. index from 0 to 255)
-// Ciphertext GIFT64_ENC::IsEq(vector<Ciphertext> x, int index){
-//     vector<Ciphertext> multi_queue;
-//     for (int i=0;i<4;i++){
-//         if( bit_index[index][i] == 1 ){ 
-//             multi_queue.push_back(x[i]);
-//         }
-//     }
-//     Ciphertext tmp;
-
-//     cout << "before multiply_many size: "<<multi_queue.size()<<endl;
-//     if ( multi_queue.size() == 1 )  return multi_queue[0];
-
-//     for(int i=1;i<multi_queue.size();i++){
-//         evaluator.multiply_inplace(multi_queue[0], multi_queue[i]);
-//         evaluator.relinearize_inplace(multi_queue[0], relin_keys);
-//         evaluator.rescale_to_next_inplace(multi_queue[0]);
-//         for(int j=i+1;j<multi_queue.size();j++)
-//             evaluator.rescale_to_next_inplace(multi_queue[j]);
-//     }
-
-//     return multi_queue[0];
-// }
 
 void GIFT64_ENC::subbyte_lut(vector<Ciphertext> &x){
     // construct 4-bit val of the sbox

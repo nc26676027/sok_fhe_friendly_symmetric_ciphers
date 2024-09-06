@@ -355,20 +355,7 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	EncryptionParameters parms(scheme_type::ckks);
 	size_t poly_modulus_degree = (size_t)(1 << logN);
 	parms.set_poly_modulus_degree(poly_modulus_degree);
-
-    parms.set_coeff_modulus(
-        {0x1ffffffea0001, 0x3ffffe80001, 0x3ffffd20001,
-		0x3ffffca0001, 0x3ffffbe0001, 0x40000560001,
-		0x400005c0001, 0x400006c0001, 0x400007a0001,
-		0x40000800001, 0x400008a0001, 0x40000b00001, 
-		0x3ffff4e0001, // first modulu and remaining modulus
-		0x20000001a0001, 0x1ffffffd40001, 0x1ffffffba0001,
-		0x1ffffffb40001, 0x1ffffffb00001, 0x20000005e0001,
-		0x1ffffffa20001, 0x2000000860001, 0x1ffffff780001,
-		0x1ffffff5c0001, 0x2000000b00001, // Mod1 and C2S modulus
-		0x4000000120001, 0x3ffffffd20001, 0x4000000420001,
-		0x3ffffffb80001, 0x4000000660001}); //KS modulus
-	// parms.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, coeff_bit_vec)); 
+	parms.set_coeff_modulus(CoeffModulus::Create(poly_modulus_degree, coeff_bit_vec)); 
 
 	// added
 	size_t secret_key_hamming_weight = 192;
@@ -473,8 +460,6 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	else if(layer_num == 56) end_num = 8;	// 0 ~ 8
 	else if(layer_num == 110) end_num = 17;	// 0 ~ 17
 	else throw std::invalid_argument("layer_num is not correct");
-
-
 //****************    transcipher    *******************
 
 #if 1
@@ -489,7 +474,7 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	vector<vector<vector<double> > > formatted_image(4, vector<vector<double> >(10));//128bit put 4 ciphertext
 
 	// #pragma omp parallel for num_threads(1)
-	for(size_t image_id = start_image_id; image_id <=end_image_id; image_id++)
+	for(size_t image_id = start_image_id; image_id <=end_image_id; image_id++)//  image latency test
 	{	
 		cout << "image id: " << image_id << endl;
 		// each thread output result file
@@ -514,16 +499,6 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 		for(long i=0; i<32*32*3; i++) {in>>val; image[i]=val;} in.close();
 		// divide image by B
 		for(long i=0; i<image.size(); i++) { image[i] /= B; image[i] += 1;}	// for boundary [-1,1]
-		//debug
-		if( (image_id - start_image_id) == 0){
-			cout<<"plaintext data image0 = ";
-
-			for(size_t i=0;i<20;i++){
-				cout<<"("<<image[i]<<"), ";
-				if (i%20 == 0) cout <<endl;
-			}
-			cout <<"\n\nfinished..............\n\n"<<endl;
-		}
 		int cur_col = (image_id-start_image_id) % 10;
 		int cur_row = (image_id-start_image_id) / 10;
 		formatted_image[cur_row][cur_col] = image;
@@ -548,26 +523,14 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 	vector<uint8_t> pt_encode;
 	for(size_t i=0;i<formated_input_data.size();i++){
 		for(size_t j=0;j<formated_input_data[0].size();j++){
-			// if (i<3) {
-			// 	uint8_t pt = formated_input_data[i][j];
-			// 	// cout << "formated_: "<<i<<"N: "<<j<<"value: "<<(int) pt<<endl;
-			// }
 			pt_encode.push_back( formated_input_data[i][j] );
 		}
 	}
-
+	
 	transcipher.encode_ciphertext(pt_encode, block_num);
 	vector<Ciphertext> ct_txt = transcipher.HE_decrypt(sk, 128*block_num);	
-	// for(int i=0; i < 8; i++){
-	// 	transcipher.debugPrint(ct_txt[i], " Obtained Ciphertext ");
-	// }
-	// vector<Ciphertext> ct_txt = transcipher.get_encoded_ct();
 
-	// for(size_t i=0;i<ct_txt.size();i++){
-	// 	for(int j=0; j<boot_level+9; j++) evaluator.mod_switch_to_next_inplace(ct_txt[i]);
-	// }
 	auto time_start_convert = chrono::high_resolution_clock::now();
-
 	std::vector<Ciphertext> S;
 	for(size_t i=0;i<4;i++){
 		vector<Ciphertext> bits( ct_txt.begin()+32*i, ct_txt.begin()+32*(i+1) );
@@ -604,9 +567,8 @@ void ResNet_cifar10_seal_sparse(size_t layer_num, size_t start_image_id, size_t 
 cout<<"Not running transciphering!\n\n\n"<<endl;
 #endif
 	#pragma omp parallel for num_threads(1)
-	// #pragma omp parallel for schedule(dynamic)
-	for(size_t image_id = start_image_id; image_id <=end_image_id; image_id++)
-	// for(size_t image_id = 0; image_id <=0; image_id++)
+	// for(size_t image_id = start_image_id; image_id <=end_image_id; image_id++)
+	for(size_t image_id = 0; image_id <=0; image_id++)//latency test
 	{
 		// cout << "image id: " << image_id << endl;
 		// each thread output result file
