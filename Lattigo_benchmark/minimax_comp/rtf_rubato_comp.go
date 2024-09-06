@@ -6,7 +6,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/ldsec/lattigo/v2/ckks_cipher"
 	"github.com/ldsec/lattigo/v2/ckks_fv"
 	"github.com/ldsec/lattigo/v2/ring"
 	"github.com/ldsec/lattigo/v2/utils"
@@ -221,7 +220,7 @@ func MinimaxCompRubato( name string, rubatoParam int) {
 	ctxt, _ := minimaxComp(comp_no, deg, alpha, tree, scaledVal, context, ctBoot, ctBoot2)
 
 	rtnVec := context.encoder.DecodeComplex(context.decryptor.DecryptNew(ctxt), context.params.LogSlots())
-	ckks_cipher.PrintVectorTrunc(rtnVec, 7, 3)
+	ckks_fv.PrintDebugVecC(rtnVec, 7, 3)
 	elapsed := time.Since(Start) // 
 	fmt.Printf("The infer operation took %v\n", elapsed)
 }

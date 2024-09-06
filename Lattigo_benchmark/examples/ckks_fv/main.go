@@ -770,22 +770,6 @@ func testRtFRubatoModDown(rubatoParam int, paramIndex int, radix int, fullCoeffs
 	}
 }
 
-func printDebug2(params *ckks_fv.Parameters, ciphertext *ckks_fv.Ciphertext, valuesWant []complex128, decryptor ckks_fv.CKKSDecryptor, encoder ckks_fv.CKKSEncoder) {
-
-	valuesTest := encoder.DecodeComplex(decryptor.DecryptNew(ciphertext), params.LogSlots())
-	logSlots := params.LogSlots()
-	sigma := params.Sigma()
-
-	fmt.Printf("Level: %d (logQ = %d)\n", ciphertext.Level(), params.LogQLvl(ciphertext.Level()))
-	fmt.Printf("Scale: 2^%f\n", math.Log2(ciphertext.Scale()))
-	fmt.Printf("ValuesTest: %6.10f %6.10f %6.10f %6.10f...\n", valuesTest[0], valuesTest[1], valuesTest[2], valuesTest[3])
-	fmt.Printf("ValuesWant: %6.10f %6.10f %6.10f %6.10f...\n", valuesWant[0], valuesWant[1], valuesWant[2], valuesWant[3])
-
-	precStats := ckks_fv.GetPrecisionStats(params, encoder, nil, valuesWant, valuesTest, logSlots, sigma)
-
-	fmt.Println(precStats.String())
-}
-
 func findRubatoModDown(rubatoParam int, radix int) {
 	var err error
 
@@ -957,8 +941,6 @@ func printDebug2(params *ckks_fv.Parameters, ciphertext *ckks_fv.Ciphertext, val
 }
 
 func main2() {
-	// findHeraModDown(4, 0, 2, false)
-	testPlainRubato(ckks_fv.RUBATO80L)
-	// testFVRubato(ckks_fv.RUBATO80L)
-	// findRubatoModDown(ckks_fv.RUBATO80S, 2)
+	testPlainRubato(ckks_fv.RUBATO128M)
+
 }

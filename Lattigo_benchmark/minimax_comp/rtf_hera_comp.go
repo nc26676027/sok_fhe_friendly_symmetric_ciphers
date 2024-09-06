@@ -6,7 +6,6 @@ import (
 	"math"
 	"time"
 
-	"github.com/ldsec/lattigo/v2/ckks_cipher"
 	"github.com/ldsec/lattigo/v2/ckks_fv"
 	"github.com/ldsec/lattigo/v2/utils"
 	"golang.org/x/crypto/sha3"
@@ -14,8 +13,6 @@ import (
 
 
 func MinimaxCompHera( name string, numRound int, paramIndex int, radix int, fullCoeffs bool) {
-
-
 	// plain_dnn := false;
 	// approx ReLU setting
 	alpha := 13		// precision parameter alpha
@@ -260,7 +257,7 @@ func MinimaxCompHera( name string, numRound int, paramIndex int, radix int, full
 	// To equalize the scale, the function evaluator.SetScale(ciphertext, parameters.Scale) can be used at the expense of one level.
 	if fullCoeffs {
 		ctBoot[0], ctBoot[1] = hbtp.HalfBoot(ciphertext, false)
-		ctBoot[2], ctBoot[3] = hbtp.HalfBoot(ciphertext2, false)
+		// ctBoot[2], ctBoot[3] = hbtp.HalfBoot(ciphertext2, false)
 	} else {
 		// ctBoot, _ = hbtp.HalfBoot(ciphertext, true)
 		panic("half coeff not coded")
@@ -278,19 +275,15 @@ func MinimaxCompHera( name string, numRound int, paramIndex int, radix int, full
 	Start := time.Now()
 	//stage 1
 	ctxt1, _:= minimaxComp(comp_no, deg, alpha, tree, scaledVal, context, ctBoot[0], ctBoot[1])
-	printDebug(context, ctxt1, "sort max u4:")
 	elapsed := time.Since(Start) 
+
+	rtnVec := context.encoder.DecodeComplex(context.decryptor.DecryptNew(ctxt1), context.params.LogSlots())
+	
+	ckks_fv.PrintDebugVecC(rtnVec, 7, 3)
+
 	fmt.Printf("The infer operation took %v\n", elapsed)
 }
 
-func printDebug(context *testParams, ciphertext *ckks_fv.Ciphertext, strs string )  {
-
-	fmt.Println(strs)
-	valuesTest := context.encoder.DecodeComplex(context.decryptor.DecryptNew(ciphertext), context.params.LogSlots())
-	ckks_cipher.PrintVectorTrunc(valuesTest, 7, 3)
-
-	return
-}
 
 func plainHera(roundNum int, nonce []byte, key []uint64, plainModulus uint64) (state []uint64) {
 	nr := roundNum

@@ -417,10 +417,5 @@ func printDebug(params *ckks_fv.Parameters, ciphertext *ckks_fv.Ciphertext, valu
 	fmt.Println(precStats.String())
 }
 func main() {
-	// testPlainMasta(ckks_fv.PASTA4M)
-	// findPastaModDown(ckks_fv.PASTA4M, 2)
-	// testPlainMasta(ckks_fv.MASTA5M)
-	// panic("Done Plain test")
-	// benchmarkRtFMasta( ckks_fv.MASTA6S)
 	benchmarkRtFMasta( ckks_fv.MASTA7M)
 }

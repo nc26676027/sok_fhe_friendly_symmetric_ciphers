@@ -513,12 +513,5 @@ func printDebug2(params *ckks_fv.Parameters, ciphertext *ckks_fv.Ciphertext, val
 }
 
 func main2() {
-	// testPlainPasta(ckks_fv.PASTA4M)
-	// findPastaModDown(ckks_fv.PASTA4M, 2)
-
-	// benchmarkRtFPasta( ckks_fv.PASTA4M)
-	// benchmarkRtFPasta( ckks_fv.PASTA4S)
-
 	benchmarkRtFPasta( ckks_fv.PASTA5M)
-
 }

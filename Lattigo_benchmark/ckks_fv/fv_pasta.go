@@ -523,3 +523,12 @@ func PrintDebugVec( vec []uint64, start, end int ) error {
 	fmt.Println( vec[:start],"  ...  ", vec[starIDX:])
 	return nil
 }
+
+func PrintDebugVecC( vec []complex128, start, end int ) error {
+	if start > len(vec) || end > len(vec) {
+		panic("Print element size is larger than vector size!")
+	}
+	starIDX := len( vec ) - end
+	fmt.Println( vec[:start],"  ...  ", vec[starIDX:])
+	return nil
+}
