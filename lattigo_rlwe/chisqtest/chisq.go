@@ -10,7 +10,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/ldsec/lattigo/v2/ckks_fv"
 	"github.com/tuneinsight/lattigo/v6/circuits/ckks/bootstrapping"
 	"github.com/tuneinsight/lattigo/v6/core/rlwe"
 	"github.com/tuneinsight/lattigo/v6/ring"
@@ -158,15 +157,8 @@ func IncompleteGamma(val, p float64) float64 {
 
 }
 
-func ToComplexVec( input []float64 ) []complex128 {
-	res := make([]complex128, len(input))
-	for i, el := range input {
-		res[i] = complex(el, 0)
-	}
-	return res
-}
 
-func BinaryTreeAdd(vector []*rlwe.Ciphertext, evaluator *ckks.Evaluator) *rlwe.Ciphertext {
+func BinaryTreeAdd(vector []*rlwe.Ciphertext, evaluator *bootstrapping.Evaluator) *rlwe.Ciphertext {
 
 	for j := 1; j < len(vector); j=j*2 {
 		for i := 0; i<len(vector); i = i + 2*j {
@@ -208,12 +200,14 @@ func RunChi2(SNPDir, SNPFileName, pValue, Runtime, SampleSize, SNPs string) {
 	fmt.Println("Number of SNPs =", len(sData[0]))
 	fmt.Println("Number of yData =", len(yData))
 
+	workingLevel := 3 // Specify the working level to reduce Mul complexity
+
 	LogN := 16
 	params, err := ckks.NewParametersFromLiteral(ckks.ParametersLiteral{
 		LogN:            LogN,                                              // Log2 of the ring degree
-		LogQ:            []int{55, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40}, // Log2 of the ciphertext prime moduli
+		LogQ:            []int{58, 42, 42, 42, 42, 42, 42, 42, 42, 42, 42}, // Log2 of the ciphertext prime moduli
 		LogP:            []int{61, 61, 61, 61, 61},                                 // Log2 of the key-switch auxiliary prime moduli
-		LogDefaultScale: 40,                                                // Log2 of the scale
+		LogDefaultScale: 42,                                                // Log2 of the scale
 		Xs:              ring.Ternary{H: 192},
 	})
 	btpParametersLit := bootstrapping.ParametersLiteral{
@@ -234,10 +228,6 @@ func RunChi2(SNPDir, SNPFileName, pValue, Runtime, SampleSize, SNPs string) {
 		panic(err)
 	}
 
-	
-	fmt.Println()
-	fmt.Printf("CKKS parameters: logN = %d, logSlots = %d, h = %d, logQP = %d, levels = %d, scale= 2^%f, sigma = %f \n", params.LogN(), params.LogSlots(), btpParams.H, params.LogQP(), params.Levels(), math.Log2(params.Scale()), params.Sigma())
-
 	// Scheme context and keys
 	kgen := rlwe.NewKeyGenerator(params)
 
@@ -246,7 +236,9 @@ func RunChi2(SNPDir, SNPFileName, pValue, Runtime, SampleSize, SNPs string) {
 	encoder := ckks.NewEncoder(params)
 	decryptor := rlwe.NewDecryptor(params, sk)
 	encryptor := rlwe.NewEncryptor(params, pk)
-	evk, _, err := btpParams.GenEvaluationKeysWithOthers(sk, )
+	step := M // Collect half  ind1 || ind2 with each 16384 SNPs of total 32768 SNPs
+	galEls := params.GaloisElements( []int{step} )
+	evk, _, err := btpParams.GenEvaluationKeysWithOthers(sk, galEls)
 	if err != nil {
 		panic(err)
 	}
@@ -254,21 +246,19 @@ func RunChi2(SNPDir, SNPFileName, pValue, Runtime, SampleSize, SNPs string) {
 	if eval, err = bootstrapping.NewEvaluator(btpParams, evk); err != nil {
 		panic(err)
 	}
-
-	// context.params.SetLogSlots(15)
-	workingLevel := 12
-
+	
 	sCiphertexts := make([]*rlwe.Ciphertext, N/2)
-
+	
 	for i := 0; i < N/2; i++ {
 		individual := make([]float64, 2*M)
 		copy(individual[:M], sData[i])
 		copy(individual[M:], sData[N/2 + i])
-
-		plaintext := encoder.EncodeComplexNTTNew( ToComplexVec(individual), params.LogSlots())
-		S := encryptor.EncryptNew(plaintext)
+		S := ckks.NewCiphertext(params, 1, workingLevel)
+		plaintext := ckks.NewPlaintext(params, workingLevel)
+		encoder.Encode( individual, plaintext )
+		encryptor.Encrypt(plaintext, S)
 		for S.Level() > workingLevel {
-			evaluator.DropLevel(S, 1)
+			eval.DropLevel(S, 1)
 		}
 		sCiphertexts[i] = S
 	}
@@ -280,44 +270,46 @@ func RunChi2(SNPDir, SNPFileName, pValue, Runtime, SampleSize, SNPs string) {
 			individual[j] = yData[i]
 			individual[j+M] = yData[N/2 + i]
 		}
-		plaintext := encoder.EncodeComplexNTTNew( ToComplexVec(individual), params.LogSlots() )
-		yCiphertexts[i] = encryptor.EncryptNew(plaintext)
-		Y := encryptor.EncryptNew(plaintext)
-		for Y.Level() > workingLevel {
-			evaluator.DropLevel(Y, 1)
+		plaintext := ckks.NewPlaintext(params, workingLevel)
+		encoder.Encode( individual, plaintext )
+		yCiphertexts[i], err = encryptor.EncryptNew(plaintext)
+		if err != nil {
+			panic(err)
 		}
-		yCiphertexts[i] = Y
+		for yCiphertexts[i].Level() > workingLevel {
+			eval.DropLevel(yCiphertexts[i], 1)
+		}
 	}
 
-	dVal := make([]complex128, M)
+	dVal := make([]float64, M)
 	for i, _ := range dVal {
 		tmp := float64(N)
-		dVal[i] = complex(2 * tmp, 0)
+		dVal[i] = 2 * tmp
 	}
 	// d := encoder.EncodeComplexNTTNew( dVal, params.LogSlots())
 
-	dValScaled := make([]complex128, M)
+	dValScaled := make([]float64, M)
 	for i, _ := range dValScaled {
 		tmp := float64(N)
-		dValScaled[i] = complex(2 * tmp * scalingFactor, 0)
+		dValScaled[i] = 2 * tmp * scalingFactor
 	}
-
-	dScaled := encoder.EncodeComplexNTTNew(dValScaled, params.LogSlots())
+	dScaled := ckks.NewPlaintext(params, workingLevel)
+	encoder.Encode(dValScaled, dScaled)
 
 	start := time.Now()
 
 	ySum := make([]*rlwe.Ciphertext, len(yCiphertexts) )
 	for i := range yCiphertexts {
-		ySum[i] = yCiphertexts[i].CopyNew().Ciphertext()
+		ySum[i] = yCiphertexts[i].CopyNew()
 	}
-	yU := BinaryTreeAdd(ySum, evaluator)
+	yU := BinaryTreeAdd(ySum, eval)
 
 	var chiD, chiN, orD, orN *rlwe.Ciphertext 
 	ySMult := make([]*rlwe.Ciphertext, N/2)
 
 	for i := 0; i < N/2; i++ {
-		ySMult[i] = evaluator.MulRelinNew(sCiphertexts[i], yCiphertexts[i])
-		evaluator.RescaleMany(ySMult[i], 1, ySMult[i])
+		ySMult[i], err = eval.MulRelinNew(sCiphertexts[i], yCiphertexts[i])
+		eval.Rescale(ySMult[i], ySMult[i])
 	}
 	// var wg sync.WaitGroup // 用于等待所有goroutine完成的同步工具
 	// for i := 0; i < N/2; i++ {
@@ -332,74 +324,104 @@ func RunChi2(SNPDir, SNPFileName, pValue, Runtime, SampleSize, SNPs string) {
 	// wg.Wait() // 等待所有goroutine完成
 
 
-	n11 := BinaryTreeAdd(ySMult, evaluator);
-	c1 := BinaryTreeAdd(sCiphertexts, evaluator);
+	n11 := BinaryTreeAdd(ySMult, eval)
+	c1 := BinaryTreeAdd(sCiphertexts, eval)
 	
 	//Rotate step
-	step := M
-	n11Rot := evaluator.RotateNew(n11, step)
-	evaluator.Add(n11, n11Rot, n11)
-	
-	c1Rot := evaluator.RotateNew(c1, step)
-	evaluator.Add(c1, c1Rot, c1)
-	
-	yURot := evaluator.RotateNew(yU, step)
-	evaluator.Add(yU, yURot, yU)
-	
-	// printDebug( "n11: ", params, n11, decryptor, encoder)
-	// printDebug( "c1: ", params, c1, decryptor, encoder)
-	// printDebug( "yU: ", params, yU, decryptor, encoder)
+	n11Rot, err := eval.RotateNew(n11, step)
+	eval.Add(n11, n11Rot, n11)
+	if err != nil {
+		panic(err)
+	}
+	c1Rot, err := eval.RotateNew(c1, step)
+	eval.Add(c1, c1Rot, c1)
+	if err != nil {
+		panic(err)
+	}
+	yURot, err := eval.RotateNew(yU, step)
+	eval.Add(yU, yURot, yU)
+	if err != nil {
+		panic(err)
+	}
+	printDebug( "n11: ", params, n11, decryptor, encoder)
+	printDebug( "c1: ", params, c1, decryptor, encoder)
+	printDebug( "yU: ", params, yU, decryptor, encoder)
 
 	// r1 = 2 * yU
-	r1 := evaluator.AddNew(yU, yU)
-	r1Scaled := evaluator.MultByConstNew(r1, complex(float64(scalingFactor), 0))
-	evaluator.RescaleMany(r1Scaled, 1, r1Scaled)
-	
-	c1Scaled := evaluator.MultByConstNew(c1, complex(float64(scalingFactor), 0))
-	evaluator.RescaleMany(c1Scaled, 1, c1Scaled)
-	
+	r1, err := eval.AddNew(yU, yU)
+	r1Scaled, err := eval.MulNew(r1, float64(scalingFactor) )
+	if err != nil {
+		panic(err)
+	}
+	eval.Rescale(r1Scaled, r1Scaled)
+
+	c1Scaled, err := eval.MulNew(c1, float64(scalingFactor) )
+	eval.Rescale(c1Scaled, c1Scaled)
+	if err != nil {
+		panic(err)
+	}
 	// compute Chi2
-	mult1 := evaluator.MulRelinNew(n11, dScaled)
-	evaluator.RescaleMany(mult1, 1, mult1)
-	
-	mult2 := evaluator.MulRelinNew(c1, r1Scaled)
-	evaluator.RescaleMany(mult2, 1, mult2)
-	
-	chiN1 := evaluator.SubNew(mult1, mult2)
-	chiN = evaluator.PowerNew(chiN1, 2)
-	
+	mult1, err := eval.MulRelinNew(n11, dScaled)
+	eval.Rescale(mult1, mult1)
+	if err != nil {
+		panic(err)
+	}
+	mult2, err := eval.MulRelinNew(c1, r1Scaled)
+	eval.Rescale(mult2, mult2)
+	if err != nil {
+		panic(err)
+	}
+	chiN1, err := eval.SubNew(mult1, mult2)
+	if err != nil {
+		panic(err)
+	}
+	chiN, err = eval.MulRelinNew(chiN1, chiN1)
+	if err != nil {
+		panic(err)
+	}
 	// denominator
-	negC1Scaled := evaluator.NegNew(c1Scaled)
-	chiD1 := evaluator.AddNew(negC1Scaled, dScaled)
-	chiD1 = evaluator.MulRelinNew(chiD1, c1)
-	evaluator.RescaleMany(chiD1, 1, chiD1)
-	
-	negR1Scaled := evaluator.NegNew(r1Scaled)
-	chiD2 := evaluator.AddNew(negR1Scaled, dScaled)
-	chiD2 = evaluator.MulRelinNew(chiD2, r1)
-	evaluator.RescaleMany(chiD2, 1, chiD2)
-	
-	chiD = evaluator.MulRelinNew( chiD1, chiD2 )
-	evaluator.RescaleMany(chiD, 1, chiD)
-	
+	negC1Scaled, err := eval.MulNew(c1Scaled, -1)
+	chiD1, err := eval.AddNew(negC1Scaled, dScaled)
+	if err != nil {
+		panic(err)
+	}
+	chiD1, err = eval.MulRelinNew(chiD1, c1)
+	if err != nil {
+		panic(err)
+	}
+	eval.Rescale(chiD1, chiD1)
+	negR1Scaled, err := eval.MulNew(r1Scaled, -1)
+	chiD2, err := eval.AddNew(negR1Scaled, dScaled)
+	chiD2, err = eval.MulRelinNew(chiD2, r1)
+	eval.Rescale(chiD2, chiD2)
+	if err != nil {
+		panic(err)
+	}
+	chiD, err = eval.MulRelinNew( chiD1, chiD2 )
+	eval.Rescale(chiD, chiD)
+	if err != nil {
+		panic(err)
+	}
 	// Odds Ratio
-	n11Scaled := evaluator.MultByConstNew(n11, complex(float64(scalingFactor), 0))
-	evaluator.RescaleMany(n11Scaled, 1, n11Scaled)
+	n11Scaled, err := eval.MulNew(n11, float64(scalingFactor) )
+	eval.Rescale(n11Scaled, n11Scaled)
 	
 	// denominator
-	or2 := evaluator.SubNew(c1, n11)
-	or3 := evaluator.SubNew(r1Scaled, n11Scaled)
-	orD = evaluator.MulRelinNew(or2, or3)
-	evaluator.RescaleMany(orD, 1, orD)
-	
+	or2, err := eval.SubNew(c1, n11)
+	or3, err := eval.SubNew(r1Scaled, n11Scaled)
+	orD, err = eval.MulRelinNew(or2, or3)
+	eval.Rescale(orD, orD)
+	if err != nil {
+		panic(err)
+	}
 	// numerator
-	or1 := evaluator.SubNew(n11Scaled, r1Scaled)
-	or1 = evaluator.SubNew(or1, c1Scaled)
-	or1 = evaluator.AddNew(or1, dScaled)
-	evaluator.RescaleMany(or1, 1, or1)
+	or1, err := eval.SubNew(n11Scaled, r1Scaled)
+	or1, err = eval.SubNew(or1, c1Scaled)
+	or1, err = eval.AddNew(or1, dScaled)
+	eval.Rescale(or1, or1)
 	
-	orN = evaluator.MulRelinNew(n11, or1)
-	evaluator.RescaleMany(orN, 1, orN)
+	orN, err = eval.MulRelinNew(n11, or1)
+	eval.Rescale(orN, orN)
 
 	endToEndTime := float64(time.Since(start).Seconds())
 
@@ -408,17 +430,23 @@ func RunChi2(SNPDir, SNPFileName, pValue, Runtime, SampleSize, SNPs string) {
 	pD := decryptor.DecryptNew(chiD)
 	oddN := decryptor.DecryptNew(orN)
 	oddD := decryptor.DecryptNew(orD)
-	msg_pN := encoder.DecodeComplex(pN, params.LogSlots())
-	msg_pD := encoder.DecodeComplex(pD, params.LogSlots())
-	msg_oddN := encoder.DecodeComplex(oddN, params.LogSlots())
-	msg_oddD := encoder.DecodeComplex(oddD, params.LogSlots())
+	
+	msg_pN := make([]float64, len(headersS))
+	msg_pD := make([]float64, len(headersS))
+	msg_oddN := make([]float64, len(headersS))
+	msg_oddD := make([]float64, len(headersS))
+
+	encoder.Decode(pN, msg_pN)
+	encoder.Decode(pD, msg_pD)
+	encoder.Decode(oddN, msg_oddN)
+	encoder.Decode(oddD, msg_oddD)
 
 	chival := make([]float64, len(headersS))
 	pval := make([]float64, len(headersS))
 	odds := make([]float64, len(headersS))
 
 	for i := 0; i < len(headersS); i++ {
-		chival[i] = real(msg_pN[i]) * 2 * float64(N) / real(msg_pD[i])
+		chival[i] = msg_pN[i] * 2 * float64(N) / msg_pD[i]
 		if chival[i] < 0 {
 			chival[i] = 0
 		}
@@ -430,7 +458,7 @@ func RunChi2(SNPDir, SNPFileName, pValue, Runtime, SampleSize, SNPs string) {
 				pval[i] = BS(math.Sqrt(chival[i]))
 			}
 		}
-		odds[i] = real(msg_oddN[i]) / real(msg_oddD[i])
+		odds[i] = msg_oddN[i] / msg_oddD[i]
 	}	
 
 	writeResults("pValue.txt", headersS, pval)
@@ -480,13 +508,14 @@ func writeRuntime(filename string, keyGenTime, encryptionTime, computationTime, 
     fmt.Fprintf(file, "End-to-end Runtime: \t\t%.3f s\n", endToEndTime)
 }
 
-func printDebug( str string, params *ckks_fv.Parameters, ciphertext *rlwe.Ciphertext, decryptor ckks_fv.CKKSDecryptor, encoder ckks_fv.CKKSEncoder) {
+func printDebug( str string, params ckks.Parameters, ciphertext *rlwe.Ciphertext, decryptor *rlwe.Decryptor, encoder *ckks.Encoder) {
 
 	fmt.Println(str)
-	valuesTest := encoder.DecodeComplex(decryptor.DecryptNew(ciphertext), params.LogSlots())
+	valuesTest := make([]float64, params.MaxSlots())
+	encoder.Decode(decryptor.DecryptNew(ciphertext), valuesTest)
 
 	fmt.Printf("Level: %d (logQ = %d)\n", ciphertext.Level(), params.LogQLvl(ciphertext.Level()))
-	fmt.Printf("Scale: 2^%f\n", math.Log2(ciphertext.Scale()))
+	fmt.Printf("Scale: 2^%f\n", ciphertext.LogScale())
 	fmt.Printf("ValuesTest: %6.10f %6.10f %6.10f %6.10f...\n", valuesTest[0], valuesTest[1], valuesTest[2], valuesTest[3])
 }
 
