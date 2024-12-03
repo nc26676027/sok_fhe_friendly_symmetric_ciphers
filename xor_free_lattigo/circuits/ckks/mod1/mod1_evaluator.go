@@ -3,7 +3,6 @@ package mod1
 
 import (
 	"fmt"
-	"math/big"
 	"math/cmplx"
 
 	"github.com/tuneinsight/lattigo/v6/circuits/ckks/polynomial"
@@ -57,15 +56,16 @@ func (eval Evaluator) EvaluateAndScaleNew(ct *rlwe.Ciphertext, scaling complex12
 		targetScale.Value.Sqrt(&targetScale.Value)
 	}
 
-	// Division by 1/2^r and change of variable for the Chebyshev evaluation
-	if evm.Mod1Type == CosDiscrete || evm.Mod1Type == CosContinuous {
-		offset := new(big.Float).Sub(&evm.Mod1Poly.B, &evm.Mod1Poly.A)
-		offset.Mul(offset, new(big.Float).SetFloat64(evm.IntervalShrinkFactor()))
-		offset.Quo(new(big.Float).SetFloat64(-0.5), offset)
-		if err = eval.Add(res, offset, res); err != nil {
-			return nil, fmt.Errorf("cannot Evaluate: %w", err)
-		}
-	}
+	// Chao remove, do not ajust the input range
+	// // Division by 1/2^r and change of variable for the Chebyshev evaluation
+	// if evm.Mod1Type == CosDiscrete || evm.Mod1Type == CosContinuous {
+	// 	offset := new(big.Float).Sub(&evm.Mod1Poly.B, &evm.Mod1Poly.A)
+	// 	offset.Mul(offset, new(big.Float).SetFloat64(evm.IntervalShrinkFactor()))
+	// 	offset.Quo(new(big.Float).SetFloat64(-0.5), offset)
+	// 	if err = eval.Add(res, offset, res); err != nil {
+	// 		return nil, fmt.Errorf("cannot Evaluate: %w", err)
+	// 	}
+	// }
 
 	// Double angle
 	sqrt2pi := complex(evm.Sqrt2Pi, 0)

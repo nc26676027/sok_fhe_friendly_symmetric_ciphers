@@ -152,7 +152,8 @@ func NewParametersFromLiteral(params ckks.Parameters, evm ParametersLiteral) (Pa
 		}
 
 	} else {
-		sqrt2pi = math.Pow(0.15915494309189535*qDiff*scaling, 1.0/scFac)
+		// sqrt2pi = math.Pow(0.15915494309189535*qDiff*scaling, 1.0/scFac)
+		sqrt2pi = 1
 	}
 
 	switch evm.Mod1Type {
@@ -198,14 +199,14 @@ func NewParametersFromLiteral(params ckks.Parameters, evm ParametersLiteral) (Pa
 	default:
 		return Parameters{}, fmt.Errorf("invalid Mod1Type")
 	}
-
-	sqrt2piBig := new(big.Float).SetFloat64(sqrt2pi)
-	for i := range mod1Poly.Coeffs {
-		if mod1Poly.Coeffs[i] != nil {
-			mod1Poly.Coeffs[i][0].Mul(mod1Poly.Coeffs[i][0], sqrt2piBig)
-			mod1Poly.Coeffs[i][1].Mul(mod1Poly.Coeffs[i][1], sqrt2piBig)
-		}
-	}
+	// Chao remove do not mul the InvModSine constant
+	// sqrt2piBig := new(big.Float).SetFloat64(sqrt2pi)
+	// for i := range mod1Poly.Coeffs {
+	// 	if mod1Poly.Coeffs[i] != nil {
+	// 		mod1Poly.Coeffs[i][0].Mul(mod1Poly.Coeffs[i][0], sqrt2piBig)
+	// 		mod1Poly.Coeffs[i][1].Mul(mod1Poly.Coeffs[i][1], sqrt2piBig)
+	// 	}
+	// }
 
 	return Parameters{
 		LevelQ:          evm.LevelQ,

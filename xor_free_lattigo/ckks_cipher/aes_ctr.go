@@ -70,22 +70,23 @@ func (aes *AESCtr) DebugTest(ciphertexts []byte, bits int) ([]*rlwe.Ciphertext, 
 			strMsg := "state[" + strconv.Itoa(i) + "] is nil, exit!"	
 			panic(strMsg) 
 		}
-		for j := 0; j < aes.totalLevel-aes.remainingLevel + 6; j++ {
+		for j := 0; j < aes.totalLevel-aes.remainingLevel; j++ {
 			aes.DropLevel(state[i], 1)
 		}
 	}
-
+	// aes.Evaluator.Add(state[0], state[0], state[0])
 	for i:=0;i<8;i++{
-		aes.DebugPrint(state[i], "before sbox: \n")
+		aes.DebugPrint(state[i], "before Bootstrap bits: \n")
 	}	
-
 	// aes.aesRoundFunction(state[:], aes.keyEncrypted)
 	evals := make([]*bootstrapping.Evaluator, 128) 
 	for i := 0; i < 128; i++ {
 		evals[i] = aes.Evaluator.ShallowCopy()
 	} 
+	Start := time.Now()
 	aes.RoundFunction(evals, state, aes.keyEncrypted)
-
+	elasp := time.Since(Start)
+	fmt.Println("\n\n\n\nOne round time: ", elasp)
 	// valuesTest := (*aes.encoder).DecodeComplex( (*aes.decryptor).DecryptNew(state[0]), aes.params.LogSlots())
 	// fmt.Println("BootReEnc debug")
 	// PrintVectorTrunc(valuesTest, 7, 3)
@@ -107,7 +108,7 @@ func (aes *AESCtr) HEDecrypt(ciphertexts []uint8, bits int) []*rlwe.Ciphertext {
 	aes.EncryptInput(iv, numBlock)
 
 	for i := 0; i < len(aes.inputEncrypted); i++ {
-		for j := 0; j < aes.totalLevel-aes.remainingLevel+5; j++ {
+		for aes.inputEncrypted[i].Level() > aes.remainingLevel + 1{
 			aes.DropLevel(aes.inputEncrypted[i], 1)
 		}
 	}
@@ -268,17 +269,13 @@ func (aes *AESCtr) EncodeCiphertext(ciphertexts []uint8, numBlock int) {
 }
 
 func (aes *AESCtr) RoundFunction( evals []*bootstrapping.Evaluator, state []*rlwe.Ciphertext, roundKey []*rlwe.Ciphertext) {
-	fmt.Printf("Chain index before sbox: %d, scale: %f\n", state[0].Level(), state[0].LogScale() )
-
 	// SubByte
 	for i := range state {
-		currLevel := state[i].Level()
-		for currLevel > 3 {
+		for state[i].Level() > aes.remainingLevel {
 			aes.DropLevel(state[i], 1)
-			currLevel--
 		}
 	}
-
+	fmt.Printf("Chain index before sbox: %d, scale: %f\n", state[0].Level(), state[0].LogScale() )
 	ch := make(chan bool, len(state))
 	for i := 0; i < 16; i++ {
 		go func(i int) {
@@ -289,35 +286,9 @@ func (aes *AESCtr) RoundFunction( evals []*bootstrapping.Evaluator, state []*rlw
 	for i := 0; i < 16; i++ {
 		<-ch
 	}
-	for i:=0;i<8;i++{
-		aes.DebugPrint(state[i], "after Sbox")
-	}
-
-	// Parallel processing for bootstrapping and cleaning tensor
-	for i:=0; i<len(state)/2; i++ {
-		go func(i int) {
-			state[i], state[2*i+1] = BootstrapConjInv(evals[i], state[i], state[2*i+1])
-			if i == 0 {
-				aes.DebugPrint(state[i], "BTS precise: ")
-			}
-			CleanReal(evals[i], state[i])
-			ch <- true
-		}(i)
-	}
-	for i := 0; i < len(state); i++ {
-		<-ch
-	}
-	// Parallel processing for bootstrapping and cleaning tensor
-	for i:=0; i<len(state); i++ {
-		go func(i int) {
-			CleanReal(evals[i], state[i])
-			ch <- true
-		}(i)
-	}
-	for i := 0; i < len(state); i++ {
-		<-ch
-	}
-
+	// for i:=0;i<8;i++{
+	// 	aes.DebugPrint(state[i], "after Sbox")
+	// }
 	// ShiftRow
 	aes.ShiftRow(state)
 	// fmt.Printf("MixColumn Chain: %d, scale: %f\n", state[0].Level(), state[0].LogScale() )
@@ -326,16 +297,33 @@ func (aes *AESCtr) RoundFunction( evals []*bootstrapping.Evaluator, state []*rlw
 	// fmt.Printf("AddRoundKey Chain: %d, scale: %f\n", state[0].Level(), state[0].LogScale() )
 	// AddRoundKey
 	aes.AddRoundKey(evals, state, roundKey)
+	// randomNumber := rand.Intn(128)
+	// fmt.Println(randomNumber)
+	// aes.DebugPrint(state[randomNumber], "After MixColumn Add Round Key, value is")
+
+	// Parallel processing for bootstrapping and cleaning tensor
+	for i:=0; i<len(state); i++ {
+		go func(i int) {
+			state[i], _ = evals[i].BootstrapReal( state[i] )
+			if i == 0 {
+				aes.DebugPrint(state[i], "BTS precise: ")
+			}
+			// CleanReal(evals[i], state[i])
+			ch <- true
+		}(i)
+	}
+	for i := 0; i < len(state); i++ {
+		<-ch
+	}
+
 }
 
 func (aes *AESCtr) LastRound( evals []*bootstrapping.Evaluator, state []*rlwe.Ciphertext, roundKey []*rlwe.Ciphertext) {
 	fmt.Printf("Chain index before sbox: %d, scale: %f\n", state[0].Level(), state[0].LogScale() )
 	// SubByte
 	for i := range state {
-		currLevel := state[i].Level()
-		for currLevel > 3 {
+		for state[i].Level() > aes.remainingLevel {
 			aes.DropLevel(state[i], 1)
-			currLevel--
 		}
 	}
 
@@ -349,36 +337,24 @@ func (aes *AESCtr) LastRound( evals []*bootstrapping.Evaluator, state []*rlwe.Ci
 	for i := 0; i < 16; i++ {
 		<-ch
 	}
-
-	// Parallel processing for bootstrapping and cleaning tensor
-	for i:=0; i<len(state)/2; i++ {
-		go func(i int) {
-			state[i], state[2*i+1] = BootstrapConjInv(evals[i], state[i], state[2*i+1])
-			if i == 0 {
-				aes.DebugPrint(state[i], "BTS precise: ")
-			}
-			CleanReal(evals[i], state[i])
-			ch <- true
-		}(i)
-	}
-	for i := 0; i < len(state); i++ {
-		<-ch
-	}
-	// Parallel processing for bootstrapping and cleaning tensor
-	for i:=0; i<len(state); i++ {
-		go func(i int) {
-			CleanReal(evals[i], state[i])
-			ch <- true
-		}(i)
-	}
-	for i := 0; i < len(state); i++ {
-		<-ch
-	}
-
 	// ShiftRow
 	aes.ShiftRow(state)
 	// AddRoundKey
 	aes.AddRoundKey(evals, state, roundKey)
+	for i:=0; i<len(state); i++ {
+		go func(i int) {
+			state[i], _ = evals[i].BootstrapReal( state[i] )
+			if i == 0 {
+				aes.DebugPrint(state[i], "BTS precise: ")
+			}
+			// CleanReal(evals[i], state[i])
+			ch <- true
+		}(i)
+	}
+	for i := 0; i < len(state); i++ {
+		<-ch
+	}
+
 }
 
 func (aes *AESCtr) coefficientMultMonomial(eval *bootstrapping.Evaluator, mon []*rlwe.Ciphertext, coeffArr []int, pos int) ( ctOut *rlwe.Ciphertext ) {
@@ -437,11 +413,11 @@ func GF2FieldMul( eval *bootstrapping.Evaluator, x []*rlwe.Ciphertext) {
         y[0+8*i] = x[1+8*i]
         y[1+8*i] = x[2+8*i]
         y[2+8*i] = x[3+8*i]
-        y[3+8*i] = XORNew(eval, x[4+8*i], x[0+8*i])
-        y[4+8*i] = XORNew(eval, x[5+8*i], x[0+8*i])
+        y[3+8*i] = FXORNew(eval, x[4+8*i], x[0+8*i])
+        y[4+8*i] = FXORNew(eval, x[5+8*i], x[0+8*i])
         y[5+8*i] = x[6+8*i]
         y[7+8*i] = x[0+8*i]
-		y[6+8*i] = XORNew(eval, x[7+8*i], x[0+8*i])
+		y[6+8*i] = FXORNew(eval, x[7+8*i], x[0+8*i])
     }
 	copy(x, y)
 }
@@ -468,10 +444,10 @@ func (aes *AESCtr) MixColumn(evals []*bootstrapping.Evaluator, x []*rlwe.Ciphert
 	ch := make(chan bool, 32)
 	for i := 0; i < 32; i++ {
 		go func(i int) {
-			y0[i] = XORNew(evals[i], x0[i], x1[i])
-			y1[i] = XORNew(evals[i], x1[i], x2[i])
-			y2[i] = XORNew(evals[i], x2[i], x3[i])
-			y3[i] = XORNew(evals[i], x3[i], x0[i])
+			y0[i] = FXORNew(evals[i], x0[i], x1[i])
+			y1[i] = FXORNew(evals[i], x1[i], x2[i])
+			y2[i] = FXORNew(evals[i], x2[i], x3[i])
+			y3[i] = FXORNew(evals[i], x3[i], x0[i])
 			ch <- true
 		}(i)
 	}
@@ -481,10 +457,10 @@ func (aes *AESCtr) MixColumn(evals []*bootstrapping.Evaluator, x []*rlwe.Ciphert
 
 	for i := 0; i < 32; i++ {
 		go func(i int) {
-			z0[i] = XORNew(evals[i], y1[i], x3[i])
-			z1[i] = XORNew(evals[i], y2[i], x0[i])
-			z2[i] = XORNew(evals[i], y3[i], x1[i])
-			z3[i] = XORNew(evals[i], y0[i], x2[i])
+			z0[i] = FXORNew(evals[i], y1[i], x3[i])
+			z1[i] = FXORNew(evals[i], y2[i], x0[i])
+			z2[i] = FXORNew(evals[i], y3[i], x1[i])
+			z3[i] = FXORNew(evals[i], y0[i], x2[i])
 			ch <- true
 		}(i)
 	}
@@ -499,10 +475,10 @@ func (aes *AESCtr) MixColumn(evals []*bootstrapping.Evaluator, x []*rlwe.Ciphert
 
 	for i := 0; i < 32; i++ {
 		go func(i int) {
-			z0[i] = XORNew(evals[i], z0[i], y0[i])
-			z1[i] = XORNew(evals[i], z1[i], y1[i])
-			z2[i] = XORNew(evals[i], z2[i], y2[i])
-			z3[i] = XORNew(evals[i], z3[i], y3[i])
+			z0[i] = FXORNew(evals[i], z0[i], y0[i])
+			z1[i] = FXORNew(evals[i], z1[i], y1[i])
+			z2[i] = FXORNew(evals[i], z2[i], y2[i])
+			z3[i] = FXORNew(evals[i], z3[i], y3[i])
 			ch <- true
 		}(i)
 	}
@@ -541,7 +517,7 @@ func (aes *AESCtr) AddRoundKey(evals []*bootstrapping.Evaluator, state, key []*r
 	ch := make(chan bool, 128)
 	for i := 0; i < 128; i++ {
 		go func(i int) {
-			XOR(evals[i], state[i], key[i], state[i])
+			FXOR(evals[i], state[i], key[i], state[i])
 			ch <- true
 		}(i)
 	}

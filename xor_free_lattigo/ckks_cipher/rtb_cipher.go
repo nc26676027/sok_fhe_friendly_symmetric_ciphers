@@ -180,6 +180,22 @@ func XORNew( eval *bootstrapping.Evaluator, ct0, ct1 *rlwe.Ciphertext) (ctOut *r
 	return
 }
 
+// //boolean function constructed from Heaan using CKKS scheme
+func FXOR( eval *bootstrapping.Evaluator, ct0, ct1 *rlwe.Ciphertext, ctOut *rlwe.Ciphertext) {
+	// x + y
+	eval.Add(ct0, ct1, ctOut)
+}
+
+// //boolean function constructed from Heaan using CKKS scheme
+func FXORNew( eval *bootstrapping.Evaluator, ct0, ct1 *rlwe.Ciphertext) (ctOut *rlwe.Ciphertext) {
+  // x + y
+  ctOut, err := eval.AddNew(ct0, ct1)
+  if err != nil {
+	  panic(err)
+  } 
+  return
+}
+
 func NOT( eval *bootstrapping.Evaluator, ct0 *rlwe.Ciphertext, ctOut *rlwe.Ciphertext ){
   	// (1-x)
 	if ct0.Degree() != ctOut.Degree() {

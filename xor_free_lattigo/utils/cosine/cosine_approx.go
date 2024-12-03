@@ -41,20 +41,33 @@ func ApproximateCos(K, degree int, dev float64, scnum int) []*big.Float {
 
 // y = cos(2 * pi * (x - 0.25)/r)
 func cos2PiXMinusQuarterOverR(x, r *big.Float) (y *big.Float) {
+	// //y = 2 * pi
+	// y = bignum.NewFloat(2.0, EncodingPrecision)
+	// y.Mul(y, pi)
+
+	// // x = (x - 0.25)/r
+	// x.Sub(x, aQuarter)
+	// x.Quo(x, r)
+
+	// // y = 2 * pi * (x - 0.25)/r
+	// y.Mul(y, x)
+
+	// // y = cos(2 * pi * (x - 0.25)/r)
+	// return bignum.Cos(y)
 	//y = 2 * pi
 	y = bignum.NewFloat(2.0, EncodingPrecision)
 	y.Mul(y, pi)
-
-	// x = (x - 0.25)/r
-	x.Sub(x, aQuarter)
-	x.Quo(x, r)
-
-	// y = 2 * pi * (x - 0.25)/r
+	// y =  pi * x
 	y.Mul(y, x)
+	// y = cos(2 * pi * x)
+	y = bignum.Cos(y)
+	// z = 1 - cos(2 * pi * x) 
+	z := bignum.NewFloat(1.0, EncodingPrecision)
+	z.Sub(z, y)
+	two := bignum.NewFloat(4.0, EncodingPrecision)
+	z.Quo(z, two)
 
-	// y = cos(2 * pi * (x - 0.25)/r)
-	return bignum.Cos(y)
-
+	return z
 }
 
 func log2(x float64) float64 {
