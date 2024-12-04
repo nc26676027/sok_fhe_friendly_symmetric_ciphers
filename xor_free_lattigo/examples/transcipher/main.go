@@ -25,13 +25,13 @@ func main() {
 	// provides a security of 128-bit.
 
 	LogN := 15
-	LogDefaultScale := 41
+	LogDefaultScale := 35
 
-	q0 := []int{42}                                    // 3) ScaleDown & 4) ModUp
-	qiSlotsToCoeffs := []int{42, 42}               // 1) SlotsToCoeffs
-	qiCircuitSlots := []int{42, 42, 42}           // 0) Circuit in the slot domain
-	qiEvalMod := []int{42, 42, 42, 42, 42, 42, 42} // 6) EvalMod
-	qiCoeffsToSlots := []int{42, 42, 42}           // 5) CoeffsToSlots
+	q0 := []int{36}                                    // 3) ScaleDown & 4) ModUp
+	qiSlotsToCoeffs := []int{35, 35}               // 1) SlotsToCoeffs
+	qiCircuitSlots := []int{35, 35, 35}           // 0) Circuit in the slot domain
+	qiEvalMod := []int{36, 36, 36, 36, 36, 36, 36, 36} // 6) EvalMod
+	qiCoeffsToSlots := []int{36, 36, 36}           // 5) CoeffsToSlots
 
 	LogQ := append(q0, qiSlotsToCoeffs...)
 	LogQ = append(LogQ, qiCircuitSlots...)
@@ -41,7 +41,7 @@ func main() {
 	params, err := ckks.NewParametersFromLiteral(ckks.ParametersLiteral{
 		LogN:            LogN,                                              // Log2 of the ring degree
 		LogQ:            LogQ, // Log2 of the ciphertext prime moduli
-		LogP:            []int{42, 42, 42, 42},                                 // Log2 of the key-switch auxiliary prime moduli
+		LogP:            []int{36, 36, 36, 36, 36},                                 // Log2 of the key-switch auxiliary prime moduli
 		LogDefaultScale: LogDefaultScale,                                                // Log2 of the scale
 		Xs:              ring.Ternary{H: 192},
 	})
@@ -63,9 +63,9 @@ func main() {
 	// Parameters of the homomorphic modular reduction x mod 1
 	Mod1ParametersLiteral := mod1.ParametersLiteral{
 		LevelQ:          params.MaxLevel() - CoeffsToSlotsParameters.Depth(true),
-		LogScale:        42,               // Matches qiEvalMod
+		LogScale:        36,               // Matches qiEvalMod
 		Mod1Type:        mod1.CosDiscrete, // Multi-interval Chebyshev interpolation
-		Mod1Degree:      126,               // Depth 5
+		Mod1Degree:      254,               // Depth 5
 		DoubleAngle:     0,                // Depth 3
 		K:               16,               // With EphemeralSecretWeight = 32 and 2^{15} slots, ensures < 2^{-138.7} failure probability
 		LogMessageRatio: 1,               // q/|m| = 2^10

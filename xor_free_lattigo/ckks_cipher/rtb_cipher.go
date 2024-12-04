@@ -334,7 +334,7 @@ func (rtb *RtBCipher) DebugPrint(ct *rlwe.Ciphertext, descriptor string) {
 		panic(err)
 	}
 	fmt.Println(descriptor)
-	PrintVectorTrunc( valuesTest, 7, 4 )
+	PrintVectorTrunc( valuesTest, 7, 8 )
 }
 
 // PrintVectorTrunc prints a truncated version of the vector.

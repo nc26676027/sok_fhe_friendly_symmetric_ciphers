@@ -119,6 +119,10 @@ func (aes *AESCtr) HEDecrypt(ciphertexts []uint8, bits int) []*rlwe.Ciphertext {
 	startAES := time.Now()
 	// AES encryption **********************************************
 	state := aes.AddWhiteKey(evals, aes.inputEncrypted, aes.keyEncrypted)
+	for i := range state {
+		evals[0].SetScale(state[i], aes.params.DefaultScale())
+	}
+	// state := aes.inputEncrypted
 	for i := 1; i < 10; i++ {
 		fmt.Printf("round iterator : %d\n", i)
 		aes.RoundFunction(evals, state, aes.keyEncrypted)
@@ -126,11 +130,14 @@ func (aes *AESCtr) HEDecrypt(ciphertexts []uint8, bits int) []*rlwe.Ciphertext {
 	fmt.Println("round iterator : last round")
 	aes.LastRound(evals, state, aes.keyEncrypted)
 	// AES encryption **********************************************
+	for i:=0;i<8;i++{
+		str := "Sbox: " + strconv.Itoa(i)
+		aes.DebugPrint(state[i], str)
+	}
 
 	endAES := time.Now()
 	durationAES := endAES.Sub(startAES)
 	fmt.Printf("代码执行时间：%d 秒 :: %d 毫秒\n", int(durationAES.Seconds()), int(durationAES.Milliseconds())%1000)
-	panic("finished")
 	// // Add cipher
 	// // encode_ciphertext(ciphertexts, num_block);
 	// for i := 0; i < len(state); i++ {
