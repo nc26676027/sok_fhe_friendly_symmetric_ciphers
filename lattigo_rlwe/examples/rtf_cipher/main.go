@@ -6,28 +6,27 @@ import (
 	"math"
 	"os"
 
-	"github.com/ldsec/lattigo/v2/ckks_fv"
-	"github.com/ldsec/lattigo/v2/ring"
-	"github.com/ldsec/lattigo/v2/utils"
+	"github.com/tuneinsight/lattigo/v6/core/rlwe"
+	"github.com/tuneinsight/lattigo/v6/ring"
+	"github.com/tuneinsight/lattigo/v6/schemes/bgv"
 	"golang.org/x/crypto/sha3"
 )
 
 func findHeraModDown(numRound int, paramIndex int, radix int, fullCoeffs bool) {
 	var err error
 
-	var kgen ckks_fv.KeyGenerator
-	var fvEncoder ckks_fv.MFVEncoder
-	var sk *ckks_fv.SecretKey
-	var pk *ckks_fv.PublicKey
-	var fvEncryptor ckks_fv.MFVEncryptor
-	var fvDecryptor ckks_fv.MFVDecryptor
-	var fvEvaluator ckks_fv.MFVEvaluator
-	var fvNoiseEstimator ckks_fv.MFVNoiseEstimator
+	var kgen *rlwe.KeyGenerator
+	var fvEncoder *bgv.Encoder
+	var sk *rlwe.SecretKey
+	var pk *rlwe.PublicKey
+	var fvEncryptor *rlwe.Encryptor
+	var fvDecryptor *rlwe.Decryptor
+	var fvEvaluator bgv.Evaluator
 	var hera ckks_fv.MFVHera
 
 	var nonces [][]byte
 	var key []uint64
-	var stCt []*ckks_fv.Ciphertext
+	var stCt []*rlwe.Ciphertext
 	var keystream [][]uint64
 
 	var heraModDown []int
