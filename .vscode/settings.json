@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "*.cpp": "cpp",
+        "*.sage": "python",
         "pointers": "cpp",
         "cctype": "cpp",
         "clocale": "cpp",
@@ -75,6 +76,14 @@
         "streambuf": "cpp",
         "thread": "cpp",
         "typeinfo": "cpp",
-        "variant": "cpp"
-    }
+        "variant": "cpp",
+        "csetjmp": "cpp",
+        "strstream": "cpp",
+        "cfenv": "cpp",
+        "typeindex": "cpp",
+        "valarray": "cpp",
+        "perf.h": "c",
+        "*.ipp": "cpp"
+    },
+    "cmake.sourceDirectory": "/home/niuchao/sok_fhe_friendly_symmetric_ciphers/bit_rgsw/fftw-3.3.10"
 }

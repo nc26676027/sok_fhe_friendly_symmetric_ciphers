@@ -157,11 +157,11 @@ const (
 	// DefaultSlotsToCoeffsFactorizationDepth is the default factorization depth SlotsToCoeffs step.
 	DefaultSlotsToCoeffsFactorizationDepth = 3
 	// DefaultCoeffsToSlotsLogScale is the default scaling factors for the CoeffsToSlots step.
-	DefaultCoeffsToSlotsLogScale = 56
+	DefaultCoeffsToSlotsLogScale = 58
 	// DefaultSlotsToCoeffsLogScale is the default scaling factors for the SlotsToCoeffs step.
-	DefaultSlotsToCoeffsLogScale = 39
+	DefaultSlotsToCoeffsLogScale = 42
 	// DefaultEvalModLogScale is the default scaling factor for the EvalMod step.
-	DefaultEvalModLogScale = 60
+	DefaultEvalModLogScale = 58
 	// DefaultEphemeralSecretWeight is the default Hamming weight of the ephemeral secret.
 	DefaultEphemeralSecretWeight = 32
 	// DefaultIterations is the default number of bootstrapping iterations.

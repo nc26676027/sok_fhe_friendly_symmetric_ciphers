@@ -39,7 +39,7 @@ func NewRtBCipher( key []uint8, param_ ckks.Parameters, btpParams_ bootstrapping
 		encryptor:		encryptor_,
 		decryptor:		decryptor_,
 		totalLevel: 	param_.MaxLevel(),
-		remainingLevel: btpParams_.ResidualParameters.MaxLevel(),
+		remainingLevel: param_.MaxLevel() - btpParams_.Depth() + btpParams_.SlotsToCoeffsParameters.LevelQ,
 		keyEncrypted: 	make([]*rlwe.Ciphertext, 0),
 		inputEncrypted: make([]*rlwe.Ciphertext, 0),
 		encodeCipher: 	make([]*rlwe.Ciphertext, 0),
@@ -60,19 +60,6 @@ func BootstrapCipher(eval *bootstrapping.Evaluator, ct *rlwe.Ciphertext ) ( ctOu
 	return
 }
 
-func BootstrapConjInv(eval *bootstrapping.Evaluator, ct0, ct1 *rlwe.Ciphertext ) ( ctOut1, ctOut2 *rlwe.Ciphertext ){
-	// for ct.Level() > 1 {
-	// 	rtb.DropLevel(ct, 1)
-	// }
-	// ct.SetScale(math.Exp2(math.Round(math.Log2(ct.Scale())))) // rounds to the nearest power of two
-	ctOut1, ctOut2, err := eval.EvaluateConjugateInvariant(ct0, ct1)
-	
-	if err != nil {
-		panic(err)
-	}
-
-	return
-}
 
 // func BootReEnc( eval *bootstrapping.Evaluator, decryptor rlwe.Decryptor, ct *rlwe.Ciphertext ) *rlwe.Ciphertext {
 // 	valuesTest := eval.Decode( decryptor.DecryptNew(ct), eval.LogMaxSlots())
