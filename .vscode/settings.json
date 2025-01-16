@@ -85,5 +85,6 @@
         "perf.h": "c",
         "*.ipp": "cpp"
     },
-    "cmake.sourceDirectory": "/home/niuchao/sok_fhe_friendly_symmetric_ciphers/bit_rgsw/fftw-3.3.10"
+    "cmake.sourceDirectory": "/home/niuchao/sok_fhe_friendly_symmetric_ciphers/bit_rgsw/fftw-3.3.10",
+    "git.ignoreLimitWarning": true
 }

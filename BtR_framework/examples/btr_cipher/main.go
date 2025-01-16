@@ -23,7 +23,7 @@ func main() {
 	runtime.GOMAXPROCS(1)
 	// Default LogN, which with the following defined parameters
 	// provides a security of 128-bit.
-	LogN := 16
+	LogN := 12
 
 	if *flagShort {
 		LogN -= 3
