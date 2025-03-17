@@ -195,7 +195,7 @@ func ResNetCifar10Sparse( layerNum, startImageID, endImageID int){
 		cnn, _ = ReLU_plain(cnn, comp_no, deg, alpha, tree, scaledVal, logp, B)
 		fmt.Println("After ReLu")
 		PrintDebugVec(cnn.vec, 7, 7)
-		panic("done")
+		// panic("done")
 		for j:=0; j<3; j++ {// layer 1_x, 2_x, 3_x
 		
 			if j==0 { 
